@@ -188,7 +188,7 @@ fix_url () {
     fi
 
     # Remove question marks at end
-    FILENAME=$(echo $FILENAME | sed -e 's/?=.*$//')
+    FILENAME=$(echo $FILENAME | sed -e 's/?.*$//')
 }
 
 fetch_podcasts () {
@@ -245,16 +245,20 @@ fetch_podcasts () {
                 fi
                 if [ ! -e $DATADIR/"$FILENAME" ]; then
                     if verbose; then
-                        crunch "Fetching $FILENAME..."
+                        crunch "Fetching $FILENAME and saving in \
+                            directory $DATADIR..."
                     fi
                     if echo $FEED | grep -q "msnbc"; then
+                        cd $INCOMING
                         wget $WGET_QUIET -c -T $WGET_TIMEOUT \
                             -O $INCOMING/"$FILENAME" "$DLURL"
                         mv $INCOMING/"$FILENAME" $DATADIR/"$FILENAME"
+                        cd $BASEDIR
                     else
-                        wget $WGET_QUIET -c -T $WGET_TIMEOUT \
-                            -P $INCOMING "$DLURL"
-                        mv $INCOMING/* $DATADIR/"$FILENAME"
+                        cd $INCOMING
+                        wget $WGET_QUIET -c -T $WGET_TIMEOUT "$DLURL"
+                        mv * $BASEDIR/$DATADIR/"$FILENAME"
+                        cd $BASEDIR
                     fi
                 fi
             fi
@@ -287,7 +291,8 @@ final_cleanup () {
     fi
     cat $PODLOG >> $TEMPLOG
     sort $TEMPLOG | uniq > $PODLOG
-    rm $TEMPLOG
+    rm -f $TEMPLOG
+    rm -f $TEMPRSSFILE
     if verbose; then
         echo "All done."
     fi
