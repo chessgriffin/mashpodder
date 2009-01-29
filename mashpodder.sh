@@ -11,17 +11,17 @@
 # Default values can be set here. Command-line flags override some of these.
 
 # BASEDIR: Location of podcast directories
-BASEDIR='/$HOME/podcasts'
+BASEDIR=$HOME/podcasts
 
 # DATESTRING: Valid date format for date-based archiving.  Default is
 # '%Y%m%d'.  Can be changed to other valid formats.  See man date.
 DATESTRING='%Y%m%d'
 
 #RSSFILE: Default is 'bp.conf.'  Can be changed to another file name.
-RSSFILE='$HOME/podcasts/mp.conf'
+RSSFILE=$HOME/podcasts/mp.conf
 
 #PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.
-PARSE_ENCLOSURE='$HOME/podcasts/parse_enclosure.xsl'
+PARSE_ENCLOSURE=$HOME/podcasts/parse_enclosure.xsl
 
 # M3U: Default '' means no m3u playlist created; 1 will create m3u playlist
 M3U=''
@@ -42,12 +42,12 @@ WGET_TIMEOUT='30'
 
 SCRIPT=${0##*/}
 VER=svn_r$(cat ${0} | grep '$Id: ' | head -1 | \
-    sed -e 's/^.*Id: mashpodder \([0-9.]*\) .*$/\1/')
+sed -e 's/^.*Id: mashpodder.sh \([0-9.]*\) .*$/\1/')
 CWD=$(pwd)
 INCOMING=$BASEDIR/incoming
 TEMPLOG=$BASEDIR/temp.log
 PODLOG=$BASEDIR/podcast.log
-TEMPRSSFILE=$BASEDIR/bp.conf.temp
+TEMPRSSFILE=$BASEDIR/mp.conf.temp
 
 crunch () {
     echo -e "$@" | tr -s ' ' | fmt -78
@@ -235,7 +235,6 @@ fetch_podcasts () {
             DLURL=$(curl -s -I -L -w %{url_effective} --url $URL | tail -n 1)
             fix_url $DLURL
             echo $FILENAME >> $TEMPLOG
-            echo "$URL $DLURL $FILENAME" >> $BASEDIR/testinglog
 
             if ! grep "$FILENAME" $PODLOG > /dev/null; then
                 if [ "$DLNUM" = "update" ]; then
