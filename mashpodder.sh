@@ -23,8 +23,17 @@ RSSFILE=$HOME/podcasts/mp.conf
 #PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.
 PARSE_ENCLOSURE=$HOME/podcasts/parse_enclosure.xsl
 
+# FIRST_ONLY: Default '' means updated based on what is in mp.conf; 1 will
+# download the newest episode regardless of what is in mp.conf
+FIRST_ONLY=''
+
 # M3U: Default '' means no m3u playlist created; 1 will create m3u playlist
 M3U=''
+
+# UPDATE: Default '' means update based on what is in mp.conf; 1 will cause
+# all feeds to be updated (meaning episodes will be marked as
+# downloaded but not actually downloaded).
+UPDATE=''
 
 # VERBOSE: Default '' is quiet output; 1 is verbose
 VERBOSE=''
@@ -116,6 +125,12 @@ sanity_checks () {
                 It should be set to 'none', 'all', 'update', or a number \
                 greater than zero.  Please check $RSSFILE.  Exiting"
             exit 0
+        fi
+        if [ "$FIRST_ONLY" = "1" ]; then
+            DLNUM="1"
+        fi
+        if [ "$UPDATE" = "1" ]; then
+            DLNUM="update"
         fi
         echo "$FEED $DATADIR $DLNUM" >> $TEMPRSSFILE
     done < $RSSFILE
@@ -309,13 +324,17 @@ final_cleanup () {
 
 # THIS IS THE ACTUAL START OF SCRIPT
 # Here are the command line switches
-while getopts ":c:d:mvh" OPT ;do
+while getopts ":c:d:fmuvh" OPT ;do
     case $OPT in
         c )         RSSFILE="$OPTARG"
                     ;;
         d )         DATESTRING="$OPTARG"
                     ;;
+        f )         FIRST_ONLY=1
+                    ;;
         m )         M3U=1
+                    ;;
+        u )         UPDATE=1
                     ;;
         v )         VERBOSE=1
                     ;;
@@ -324,13 +343,17 @@ $SCRIPT $VER 2009-01-30
 Usage: $0 [OPTIONS] <arguments>
 Options are:
 
--c <filename>   Use a different config file other than bp.conf
+-c <filename>   Use a different config file other than bp.conf.
 
 -d <date>       Valid date string for date-based archiving.
 
--h              Display this help message
+-f              Override mp.conf and download the first newest episode.
 
--m              Create m3u playlists
+-h              Display this help message.
+
+-m              Create m3u playlists.
+
+-u              Override mp.conf and only update (mark downloaded).
 
 -v              Display verbose messages.
 
