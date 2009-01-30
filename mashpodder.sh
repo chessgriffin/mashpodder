@@ -74,6 +74,7 @@ sanity_checks () {
         exit 0
     fi
 
+    # Check the mp.conf and make some directories if needed.
     while read LINE; do
         FEED=$(echo $LINE | cut -f1 -d ' ')
         ARCHIVETYPE=$(echo $LINE | cut -f2 -d ' ')
@@ -86,23 +87,29 @@ sanity_checks () {
         fi
 
         # Check on type of archiving and make directories
-        if [ ! "$ARCHIVETYPE" = "date" ]; then
-            DATADIR=$ARCHIVETYPE
-            if [ ! -e $DATADIR ]; then
-                crunch "The directory $DATADIR for $FEED does not exist.  \
-                    Creating now..."
-                mkdir -p $DATADIR
-            fi
-        elif [ "$ARCHIVETYPE" = "date" ]; then
-            DATADIR=$(date +$DATESTRING)
-            if [ ! -e $DATADIR ]; then
-                mkdir -p $DATADIR
+        if [ "$DLNUM" = "update" ]; then
+            if [ ! -e $ARCHIVETYPE ]; then
+                crunch "$FEED set to update.  Directory not created."
             fi
         else
-            crunch "Error in archive type for $FEED.  It should be set to \
-                'date' for date-based archiving, or to a directory name for \
-                directory-based archiving.  Exiting."
+            if [ ! "$ARCHIVETYPE" = "date" ]; then
+                DATADIR=$ARCHIVETYPE
+                if [ ! -e $DATADIR ]; then
+                    crunch "The directory $DATADIR for $FEED does not \
+                        exist. Creating now..."
+                    mkdir -p $DATADIR
+                fi
+            elif [ "$ARCHIVETYPE" = "date" ]; then
+                DATADIR=$(date +$DATESTRING)
+                if [ ! -e $DATADIR ]; then
+                    mkdir -p $DATADIR
+                fi
+            else
+                crunch "Error in archive type for $FEED.  It should be set \
+                to 'date' for date-based archiving, or to a directory name \
+                for directory-based archiving.  Exiting."
             exit 0
+            fi
         fi
 
         if [[ "$DLNUM" != "none" && "$DLNUM" != "all" && \
@@ -114,6 +121,7 @@ sanity_checks () {
         fi
         echo "$FEED $DATADIR $DLNUM" >> $TEMPRSSFILE
     done < $RSSFILE
+    #echo >> $TEMPRSSFILE
 }
 
 initial_setup () {
@@ -179,6 +187,9 @@ fix_url () {
     if echo $FIXURL | grep -q "msnbc.*vh-.*mp3$"; then
         FILENAME=$(echo $FIRSTFILENAME | sed -e 's/.*\(vh-.*mp3$\)/\1/')
         return
+    fi
+    if echo $FIXURL | grep -q "msnbc.*zeit.*m4v$"; then
+        FILENAME=$(echo $FIRSTFILENAME | sed -e 's/.*\(a_zeit.*m4v$\)/\1/')
     fi
 
     # Fix MSNBC podcast names for video feeds
@@ -248,18 +259,19 @@ fetch_podcasts () {
                         crunch "Fetching $FILENAME and saving in \
                             directory $DATADIR..."
                     fi
-                    if echo $FEED | grep -q "msnbc"; then
+                    #if echo $FEED | grep -q "msnbc"; then
+                    #    cd $INCOMING
+                    #    wget $WGET_QUIET -c -T $WGET_TIMEOUT \
+                    #        -O $INCOMING/"$FILENAME" "$DLURL"
+                    #    mv $INCOMING/"$FILENAME" $DATADIR/"$FILENAME"
+                    #    cd $BASEDIR
+                    #else
                         cd $INCOMING
-                        wget $WGET_QUIET -c -T $WGET_TIMEOUT \
-                            -O $INCOMING/"$FILENAME" "$DLURL"
-                        mv $INCOMING/"$FILENAME" $DATADIR/"$FILENAME"
+                        wget $WGET_QUIET -c -T $WGET_TIMEOUT -O "$FILENAME" \
+                            "$DLURL"
+                        mv "$FILENAME" $BASEDIR/$DATADIR/"$FILENAME"
                         cd $BASEDIR
-                    else
-                        cd $INCOMING
-                        wget $WGET_QUIET -c -T $WGET_TIMEOUT "$DLURL"
-                        mv * $BASEDIR/$DATADIR/"$FILENAME"
-                        cd $BASEDIR
-                    fi
+                    #fi
                 fi
             fi
             ((COUNTER=COUNTER+1))
