@@ -85,6 +85,7 @@ sanity_checks () {
 
     # Check the mp.conf and make some directories if needed.
     while read LINE; do
+        DLNUM="none"
         FEED=$(echo $LINE | cut -f1 -d ' ')
         ARCHIVETYPE=$(echo $LINE | cut -f2 -d ' ')
         DLNUM=$(echo $LINE | cut -f3 -d ' ')
@@ -93,6 +94,15 @@ sanity_checks () {
         if echo $LINE | grep -E '^#|^$' > /dev/null
                 then
                 continue
+        fi
+
+        if [[ "$DLNUM" != "none" && "$DLNUM" != "all" && \
+            "$DLNUM" != "update" && $DLNUM -lt 1 ]]; then
+            crunch "Something is wrong with the download type for $FEED. \
+                According to $RSSFILE, it is set to $DLNUM. \
+                It should be set to 'none', 'all', 'update', or a number \
+                greater than zero.  Please check $RSSFILE.  Exiting"
+            exit 0
         fi
 
         # Check on type of archiving and make directories
@@ -119,13 +129,6 @@ sanity_checks () {
             fi
         fi
 
-        if [[ "$DLNUM" != "none" && "$DLNUM" != "all" && \
-            "$DLNUM" != "update" && ! "$DLNUM" > "0" ]]; then
-            crunch "Something is wrong with the download number for $FEED. \
-                It should be set to 'none', 'all', 'update', or a number \
-                greater than zero.  Please check $RSSFILE.  Exiting"
-            exit 0
-        fi
         if [ "$FIRST_ONLY" = "1" ]; then
             DLNUM="1"
         fi
