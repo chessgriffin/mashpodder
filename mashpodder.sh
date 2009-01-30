@@ -23,16 +23,16 @@ RSSFILE=$HOME/podcasts/mp.conf
 #PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.
 PARSE_ENCLOSURE=$HOME/podcasts/parse_enclosure.xsl
 
-# FIRST_ONLY: Default '' means updated based on what is in mp.conf; 1 will
-# download the newest episode regardless of what is in mp.conf
+# FIRST_ONLY: Default '' means look to mp.conf on whether to download or
+# update; 1 will override mp.conf and download the newest episode
 FIRST_ONLY=''
 
 # M3U: Default '' means no m3u playlist created; 1 will create m3u playlist
 M3U=''
 
-# UPDATE: Default '' means update based on what is in mp.conf; 1 will cause
-# all feeds to be updated (meaning episodes will be marked as
-# downloaded but not actually downloaded).
+# UPDATE: Default '' means look to mp.conf on whether to download or update; 1
+# will override mp.conf and cause all feeds to be updated (meaning episodes
+# will be marked as downloaded but not actually downloaded).
 UPDATE=''
 
 # VERBOSE: Default '' is quiet output; 1 is verbose
