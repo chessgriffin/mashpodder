@@ -88,9 +88,7 @@ sanity_checks () {
 
         # Check on type of archiving and make directories
         if [ "$DLNUM" = "update" ]; then
-            if [ ! -e $ARCHIVETYPE ]; then
-                crunch "$FEED set to update.  Directory not created."
-            fi
+            DATADIR=$ARCHIVETYPE
         else
             if [ ! "$ARCHIVETYPE" = "date" ]; then
                 DATADIR=$ARCHIVETYPE
@@ -106,9 +104,9 @@ sanity_checks () {
                 fi
             else
                 crunch "Error in archive type for $FEED.  It should be set \
-                to 'date' for date-based archiving, or to a directory name \
-                for directory-based archiving.  Exiting."
-            exit 0
+                    to 'date' for date-based archiving, or to a directory \
+                    name for directory-based archiving.  Exiting."
+                exit 0
             fi
         fi
 
@@ -121,7 +119,6 @@ sanity_checks () {
         fi
         echo "$FEED $DATADIR $DLNUM" >> $TEMPRSSFILE
     done < $RSSFILE
-    #echo >> $TEMPRSSFILE
 }
 
 initial_setup () {
