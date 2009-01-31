@@ -39,7 +39,7 @@ UPDATE=''
 VERBOSE=''
 
 # WGET_QUIET: Default is '-q' for quiet wget output; change to '' for wget output
-WGET_QUIET='-q'
+WGET_QUIET=''
 
 # WGET_TIMEOUT: Default is 30 seconds; can decrease or increase if some files
 # are cut short. Thanks to Phil Smith for the bug report.
@@ -236,14 +236,14 @@ fetch_podcasts () {
 
         if verbose; then
             if [ "$DLNUM" = "all" ]; then
-                crunch "Downloading new episodes..."
+                crunch "Checking for all new episodes..."
             elif [ "$DLNUM" = "none" ]; then
                 crunch "No downloads selected..."
                 continue
             elif [ "$DLNUM" = "update" ]; then
                 crunch "Catching up in logs, but not downloading..."
             else
-                crunch "Downloading up to $DLNUM new episodes..."
+                crunch "Checking for up to $DLNUM new episodes..."
             fi
             echo
         fi
