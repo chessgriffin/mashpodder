@@ -39,7 +39,7 @@ UPDATE=''
 VERBOSE=''
 
 # WGET_QUIET: Default is '-q' for quiet wget output; change to '' for wget output
-WGET_QUIET=''
+WGET_QUIET='-q'
 
 # WGET_TIMEOUT: Default is 30 seconds; can decrease or increase if some files
 # are cut short. Thanks to Phil Smith for the bug report.
