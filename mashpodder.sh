@@ -271,7 +271,7 @@ fetch_podcasts () {
                 fi
                 if [ ! -e $DATADIR/"$FILENAME" ]; then
                     if verbose; then
-                        crunch "Fetching $FILENAME and saving in \
+                        crunch "NEW:  Fetching $FILENAME and saving in \
                             directory $DATADIR..."
                     fi
                     #if echo $FEED | grep -q "msnbc"; then
