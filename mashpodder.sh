@@ -146,6 +146,7 @@ initial_setup () {
     if verbose; then
         echo "Starting Mashpodder on"
         date
+        echo
     fi
 
     # Make incoming temp folder if necessary
@@ -229,23 +230,23 @@ fetch_podcasts () {
         DLNUM=$(echo $LINE | cut -f3 -d ' ')
         COUNTER=0
 
-        if verbose; then
-            echo
-            crunch "Checking $FEED"
-        fi
+        #if verbose; then
+        #    echo
+        #    crunch "Checking $FEED"
+        #fi
 
         if verbose; then
             if [ "$DLNUM" = "all" ]; then
-                crunch "Checking for all new episodes..."
+                crunch "Checking $FEED for any new episodes..."
             elif [ "$DLNUM" = "none" ]; then
-                crunch "No downloads selected..."
+                crunch "No downloads selected for $FEED..."
+                echo
                 continue
             elif [ "$DLNUM" = "update" ]; then
-                crunch "Catching up in logs, but not downloading..."
+                crunch "Catching $FEED up in logs, but not downloading..."
             else
-                crunch "Checking for up to $DLNUM new episodes..."
+                crunch "Checking $FEED for up to $DLNUM new episodes..."
             fi
-            echo
         fi
 
         FILE=$(wget -q $FEED -O - | \
@@ -302,6 +303,7 @@ fetch_podcasts () {
         fi
         if verbose; then
             crunch "Done.  Continuing to next feed..."
+            echo
         fi
     done < $TEMPRSSFILE
     if [ ! -f $TEMPLOG ]; then
@@ -312,7 +314,12 @@ fetch_podcasts () {
 }
 
 final_cleanup () {
-    # Create the log files and clean up
+    # Delete temp files and empty date directory, Create the log files
+    # and clean up
+    DATE=$(date +$DATESTRING)
+    if [ -z "$(ls -A $BASEDIR/$DATE 2>/dev/null)" ]; then
+        rmdir $BASEDIR/$DATE
+    fi
     if verbose; then
         crunch "Cleaning up..."
     fi
