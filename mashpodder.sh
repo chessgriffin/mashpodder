@@ -50,8 +50,9 @@ WGET_TIMEOUT='30'
 ### No changes should be necessary below this line
 
 SCRIPT=${0##*/}
-VER=svn_r$(cat ${0} | grep '$Id: ' | head -1 | \
-sed -e 's/^.*Id: mashpodder.sh \([0-9.]*\) .*$/\1/')
+#VER=svn_r$(cat ${0} | grep '$Id: ' | head -1 | \
+#sed -e 's/^.*Id: mashpodder.sh \([0-9.]*\) .*$/\1/')
+VER=svn
 CWD=$(pwd)
 INCOMING=$BASEDIR/incoming
 TEMPLOG=$BASEDIR/temp.log
@@ -144,7 +145,7 @@ initial_setup () {
 
     # Print the date
     if verbose; then
-        echo "Starting Mashpodder on"
+        echo "Starting mashpodder on"
         date
         echo
     fi
@@ -318,7 +319,7 @@ final_cleanup () {
     # and clean up
     DATE=$(date +$DATESTRING)
     if [ -z "$(ls -A $BASEDIR/$DATE 2>/dev/null)" ]; then
-        rmdir $BASEDIR/$DATE
+        rmdir $BASEDIR/$DATE 2>/dev/null
     fi
     if verbose; then
         crunch "Cleaning up..."
