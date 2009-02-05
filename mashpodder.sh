@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # $Id$
 #
@@ -17,7 +17,7 @@ BASEDIR=$HOME/podcasts
 # '%Y%m%d'.  Can be changed to other valid formats.  See man date.
 DATESTRING='%Y%m%d'
 
-#RSSFILE: Default is 'bp.conf.'  Can be changed to another file name.
+#RSSFILE: Default is 'mp.conf.'  Can be changed to another file name.
 RSSFILE=$HOME/podcasts/mp.conf
 
 #PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.
