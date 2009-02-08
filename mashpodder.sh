@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # $Id$
 #
@@ -17,11 +17,11 @@ BASEDIR=$HOME/podcasts
 # '%Y%m%d'.  Can be changed to other valid formats.  See man date.
 DATESTRING='%Y%m%d'
 
-#RSSFILE: Default is 'mp.conf.'  Can be changed to another file name.
-RSSFILE=$HOME/podcasts/mp.conf
+#RSSFILE: Default is 'bp.conf.'  Can be changed to another file name.
+RSSFILE=$BASEDIR/mp.conf
 
 #PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.
-PARSE_ENCLOSURE=$HOME/podcasts/parse_enclosure.xsl
+PARSE_ENCLOSURE=$BASEDIR/parse_enclosure.xsl
 
 # FIRST_ONLY: Default '' means look to mp.conf on whether to download or
 # update; 1 will override mp.conf and download the newest episode
@@ -84,7 +84,7 @@ sanity_checks () {
         exit 0
     fi
 
-    # Check the mp.conf and make some directories if needed.
+    # Check the mp.conf and do some basic error checking
     while read LINE; do
         DLNUM="none"
         FEED=$(echo $LINE | cut -f1 -d ' ')
@@ -106,22 +106,14 @@ sanity_checks () {
             exit 0
         fi
 
-        # Check on type of archiving and make directories
+        # Check type of archiving for each feed
         if [ "$DLNUM" = "update" ]; then
             DATADIR=$ARCHIVETYPE
         else
             if [ ! "$ARCHIVETYPE" = "date" ]; then
                 DATADIR=$ARCHIVETYPE
-                if [ ! -e $DATADIR ]; then
-                    crunch "The directory $DATADIR for $FEED does not \
-                        exist. Creating now..."
-                    mkdir -p $DATADIR
-                fi
             elif [ "$ARCHIVETYPE" = "date" ]; then
                 DATADIR=$(date +$DATESTRING)
-                if [ ! -e $DATADIR ]; then
-                    mkdir -p $DATADIR
-                fi
             else
                 crunch "Error in archive type for $FEED.  It should be set \
                     to 'date' for date-based archiving, or to a directory \
@@ -219,6 +211,16 @@ fix_url () {
     FILENAME=$(echo $FILENAME | sed -e 's/?.*$//')
 }
 
+check_directory () {
+    # Check to see if DATADIR exists and if not, create it
+    if [ ! -e $DATADIR ]; then
+        crunch "The directory $DATADIR for $FEED does not exist. Creating \
+            now..."
+        mkdir -p $DATADIR
+    fi
+    return 0
+}
+
 fetch_podcasts () {
     # This is the main loop
     local LINE FEED DATADIR DLNUM COUNTER FILE URL FILENAME DLURL
@@ -230,11 +232,6 @@ fetch_podcasts () {
         DATADIR=$(echo $LINE | cut -f2 -d ' ')
         DLNUM=$(echo $LINE | cut -f3 -d ' ')
         COUNTER=0
-
-        #if verbose; then
-        #    echo
-        #    crunch "Checking $FEED"
-        #fi
 
         if verbose; then
             if [ "$DLNUM" = "all" ]; then
@@ -264,13 +261,14 @@ fetch_podcasts () {
             fix_url $DLURL
             echo $FILENAME >> $TEMPLOG
 
-            if ! grep "$FILENAME" $PODLOG > /dev/null; then
+            if ! grep -x "^$FILENAME" $PODLOG > /dev/null; then
                 if [ "$DLNUM" = "update" ]; then
                     if verbose; then
                         crunch "Adding $FILENAME to log..."
                     fi
                     continue
                 fi
+                check_directory $DATADIR
                 if [ ! -e $DATADIR/"$FILENAME" ]; then
                     if verbose; then
                         crunch "NEW:  Fetching $FILENAME and saving in \
@@ -315,12 +313,7 @@ fetch_podcasts () {
 }
 
 final_cleanup () {
-    # Delete temp files and empty date directory, Create the log files
-    # and clean up
-    DATE=$(date +$DATESTRING)
-    if [ -z "$(ls -A $BASEDIR/$DATE 2>/dev/null)" ]; then
-        rmdir $BASEDIR/$DATE 2>/dev/null
-    fi
+    # Delete temp files, create the log files and clean up
     if verbose; then
         crunch "Cleaning up..."
     fi
