@@ -174,6 +174,9 @@ fix_url () {
     FIRSTFILENAME=$(echo $FIXURL|awk -F / '{print $NF}')
     FILENAME=$(echo $FIRSTFILENAME|awk -F ? '{print $1}')
 
+    # Remove parentheses in filenames
+    FILENAME=$(echo $FILENAME | tr -d "()")
+
     # Replace URL hex sequences in filename (like %20 for ' ' and %2B for '+')
     FILENAME=$(echo "echo $FILENAME" \
         |sed "s/%\(..\)/\$(printf \"\\\\x\\1\")/g" |bash)
