@@ -346,11 +346,11 @@ while getopts ":c:d:fmuvh" OPT ;do
         v )         VERBOSE=1
                     ;;
         h|* )       cat << EOF
-$SCRIPT $VER 2009-01-30
+$SCRIPT $VER 2009-03-05
 Usage: $0 [OPTIONS] <arguments>
 Options are:
 
--c <filename>   Use a different config file other than bp.conf.
+-c <filename>   Use a different config file other than mp.conf.
 
 -d <date>       Valid date string for date-based archiving.
 
@@ -371,8 +371,6 @@ Some of the default settings can be set permanently at the top of the script
 in the 'USER CONFIGURATION' section or temporarily by passing a command
 line switch.
 
-Please note that one also needs the parse_enclosure.xsl file found at
-the BashPodder page: http://lincgeek.org/bashpodder/.
 EOF
                     exit 0
                     ;;
