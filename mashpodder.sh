@@ -77,7 +77,7 @@ sanity_checks () {
 
     rm -f $TEMPRSSFILE
 
-    # Make sure the bp.conf file or the file passed with -c switch exists
+    # Make sure the mp.conf file or the file passed with -c switch exists
     if [ ! -e "$RSSFILE" ]; then
         crunch "The file $RSSFILE does not exist in $BASEDIR.  Run $0 -h \
             for usage. Exiting."
