@@ -77,6 +77,7 @@ sanity_checks () {
     local FEED ARCHIVETYPE DLNUM DATADIR
 
     rm -f $TEMPRSSFILE
+    touch $TEMPRSSFILE
 
     # Make sure the mp.conf file or the file passed with -c switch exists
     if [ ! -e "$RSSFILE" ]; then
