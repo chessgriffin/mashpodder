@@ -57,6 +57,7 @@ CWD=$(pwd)
 INCOMING=$BASEDIR/incoming
 TEMPLOG=$BASEDIR/temp.log
 PODLOG=$BASEDIR/podcast.log
+SUMMARYLOG=$BASEDIR/summary.log
 TEMPRSSFILE=$BASEDIR/mp.conf.temp
 
 crunch () {
@@ -137,6 +138,8 @@ initial_setup () {
 
     # Print the date
     if verbose; then
+        echo
+        echo "################################"
         echo "Starting mashpodder on"
         date
         echo
@@ -145,7 +148,7 @@ initial_setup () {
     # Make incoming temp folder if necessary
     if [ ! -e $INCOMING ]; then
         if verbose; then
-            echo "Creating temp folders..."
+            echo "Creating temp folders."
         fi
     mkdir -p $INCOMING
     fi
@@ -157,7 +160,7 @@ initial_setup () {
     # Create podcast log if necessary
     if [ ! -e $PODLOG ]; then
         if verbose; then
-            echo "Creating $PODLOG file..."
+            echo "Creating $PODLOG file."
         fi
         touch $PODLOG
     fi
@@ -238,15 +241,15 @@ fetch_podcasts () {
 
         if verbose; then
             if [ "$DLNUM" = "all" ]; then
-                crunch "Checking $FEED for any new episodes..."
+                crunch "Checking $FEED -- all episodes."
             elif [ "$DLNUM" = "none" ]; then
-                crunch "No downloads selected for $FEED..."
+                crunch "No downloads selected for $FEED."
                 echo
                 continue
             elif [ "$DLNUM" = "update" ]; then
-                crunch "Catching $FEED up in logs, but not downloading..."
+                crunch "Catching $FEED up in logs."
             else
-                crunch "Checking $FEED for up to $DLNUM new episodes..."
+                crunch "Checking $FEED -- last $DLNUM episodes."
             fi
         fi
 
@@ -267,7 +270,8 @@ fetch_podcasts () {
             if ! grep -x "^$FILENAME" $PODLOG > /dev/null; then
                 if [ "$DLNUM" = "update" ]; then
                     if verbose; then
-                        crunch "Adding $FILENAME to log..."
+                        crunch "Adding $FILENAME to log."
+                        echo "$FILENAME added to log" >> $SUMMARYLOG
                     fi
                     continue
                 fi
@@ -275,21 +279,14 @@ fetch_podcasts () {
                 if [ ! -e $DATADIR/"$FILENAME" ]; then
                     if verbose; then
                         crunch "NEW:  Fetching $FILENAME and saving in \
-                            directory $DATADIR..."
+                            directory $DATADIR."
+                        echo "$FILENAME downloaded to $DATADIR" >> $SUMMARYLOG
                     fi
-                    #if echo $FEED | grep -q "msnbc"; then
-                    #    cd $INCOMING
-                    #    wget $WGET_QUIET -c -T $WGET_TIMEOUT \
-                    #        -O $INCOMING/"$FILENAME" "$DLURL"
-                    #    mv $INCOMING/"$FILENAME" $DATADIR/"$FILENAME"
-                    #    cd $BASEDIR
-                    #else
-                        cd $INCOMING
-                        wget $WGET_QUIET -c -T $WGET_TIMEOUT -O "$FILENAME" \
-                            "$DLURL"
-                        mv "$FILENAME" $BASEDIR/$DATADIR/"$FILENAME"
-                        cd $BASEDIR
-                    #fi
+                    cd $INCOMING
+                    wget $WGET_QUIET -c -T $WGET_TIMEOUT -O "$FILENAME" \
+                        "$DLURL"
+                    mv "$FILENAME" $BASEDIR/$DATADIR/"$FILENAME"
+                    cd $BASEDIR
                 fi
             fi
             ((COUNTER=COUNTER+1))
@@ -298,13 +295,13 @@ fetch_podcasts () {
         if [ "$DLNUM" != "update" ]; then
             if [ -n "$m3u" ]; then
                 if verbose; then
-                    crunch "Creating $datadir m3u playlist..."
+                    crunch "Creating $datadir m3u playlist."
                 fi
                 ls $DATADIR | grep -v m3u > $DATADIR/podcast.m3u
             fi
         fi
         if verbose; then
-            crunch "Done.  Continuing to next feed..."
+            crunch "Done.  Continuing to next feed."
             echo
         fi
     done < $TEMPRSSFILE
@@ -318,7 +315,7 @@ fetch_podcasts () {
 final_cleanup () {
     # Delete temp files, create the log files and clean up
     if verbose; then
-        crunch "Cleaning up..."
+        crunch "Cleaning up."
     fi
     cat $PODLOG >> $TEMPLOG
     sort $TEMPLOG | uniq > $PODLOG
@@ -326,6 +323,13 @@ final_cleanup () {
     rm -f $TEMPRSSFILE
     if verbose; then
         echo "All done."
+        if [ -e $SUMMARYLOG ]; then
+            echo
+            echo "++SUMMARY++"
+            cat $SUMMARYLOG
+            rm -f $SUMMARYLOG
+        fi
+        echo "################################"
     fi
 }
 
