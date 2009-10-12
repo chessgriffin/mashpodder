@@ -294,7 +294,7 @@ fetch_podcasts () {
         done
         # Create an m3u playlist:
         if [ "$DLNUM" != "update" ]; then
-            if [ -n "$m3u" ]; then
+            if [ -n "$M3U" ]; then
                 if verbose; then
                     crunch "Creating $datadir m3u playlist."
                 fi
