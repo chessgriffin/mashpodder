@@ -3,7 +3,7 @@
 # $Id$
 #
 # Mashpodder by Chess Griffin <chess@chessgriffin.com>
-# Copyright 2009-2010
+# Copyright 2009-2011
 # Licensed under the GPLv3
 #
 # Originally based on BashPodder by Linc Fessenden 12/1/2004
@@ -12,17 +12,17 @@
 # Default values can be set here. Command-line flags override some of these.
 
 # BASEDIR: Location of podcast directories
-BASEDIR=$HOME/podcasts
+BASEDIR="$HOME/my podcasts"
 
 # DATESTRING: Valid date format for date-based archiving.  Default is
 # '%Y%m%d'.  Can be changed to other valid formats.  See man date.
 DATESTRING='%Y%m%d'
 
 #RSSFILE: Default is 'mp.conf.'  Can be changed to another file name.
-RSSFILE=$BASEDIR/mp.conf
+RSSFILE="$BASEDIR/mp.conf"
 
 #PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.
-PARSE_ENCLOSURE=$BASEDIR/parse_enclosure.xsl
+PARSE_ENCLOSURE="$BASEDIR/parse_enclosure.xsl"
 
 # FIRST_ONLY: Default '' means look to mp.conf on whether to download or
 # update; 1 will override mp.conf and download the newest episode
@@ -53,13 +53,17 @@ WGET_TIMEOUT='30'
 SCRIPT=${0##*/}
 #VER=svn_r$(cat ${0} | grep '$Id: ' | head -1 | \
 #sed -e 's/^.*Id: mashpodder.sh \([0-9.]*\) .*$/\1/')
-VER=svn
+#VER=svn
+REV="$Revision$"
+VER=svn_r$(cut -d' ' -f2 <<< "$REV")
 CWD=$(pwd)
-INCOMING=$BASEDIR/incoming
-TEMPLOG=$BASEDIR/temp.log
-PODLOG=$BASEDIR/podcast.log
-SUMMARYLOG=$BASEDIR/summary.log
-TEMPRSSFILE=$BASEDIR/mp.conf.temp
+INCOMING="$BASEDIR/incoming"
+TEMPLOG="$BASEDIR/temp.log"
+PODLOG="$BASEDIR/podcast.log"
+SUMMARYLOG="$BASEDIR/summary.log"
+TEMPRSSFILE="$BASEDIR/mp.conf.temp"
+OLDIFS=$IFS
+IFS=$'\n'
 
 crunch () {
     echo -e "$@" | tr -s ' ' | fmt -78
@@ -392,4 +396,5 @@ initial_setup
 fetch_podcasts
 final_cleanup
 cd $CWD
+IFS=$OLDIFS
 exit 0
