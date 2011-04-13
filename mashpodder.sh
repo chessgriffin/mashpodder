@@ -48,14 +48,21 @@ WGET_QUIET='-q'
 # are cut short. Thanks to Phil Smith for the bug report.
 WGET_TIMEOUT='30'
 
+# SYNC: Sync (via rsync) new downloads with media player: Default '' will not
+# sync; 1 will sync - need to also set SYNCDIR.
+SYNC='1'
+
+# SYNCDIR: Set mountpoint or path where new episodes should be synced.  Must
+# be writable by user executing this script.  Again, use double quotes if
+# there is an escaped space.
+#SYNCDIR="/mnt/device/podcasts"
+SYNCDIR="/home/chess/sync"
+
 ### END USER CONFIGURATION
 
 ### No changes should be necessary below this line
 
 SCRIPT=${0##*/}
-#VER=svn_r$(cat ${0} | grep '$Id: ' | head -1 | \
-#sed -e 's/^.*Id: mashpodder.sh \([0-9.]*\) .*$/\1/')
-#VER=svn
 REV="$Revision$"
 VER=svn_r$(cut -d' ' -f2 <<< "$REV")
 CWD=$(pwd)
@@ -139,6 +146,14 @@ sanity_checks () {
         fi
         echo "$FEED $DATADIR $DLNUM" >> $TEMPRSSFILE
     done < $RSSFILE
+
+    # Check to make sure SYNCDIR exists if SYNC=1
+    if [ "$SYNC" = "1" ]; then
+        if [ ! -d "$SYNCDIR" ]; then
+            crunch "$SYNCDIR does not exist.  Exiting."
+            exit 0
+        fi
+    fi
 }
 
 initial_setup () {
@@ -241,6 +256,7 @@ fetch_podcasts () {
 
     # Read the mp.conf file and wget any url not already in the
     # podcast.log file:
+    NEWDL=0
     while read LINE; do
         FEED=$(echo $LINE | cut -f1 -d ' ')
         DATADIR=$(echo $LINE | cut -f2 -d ' ')
@@ -293,19 +309,28 @@ fetch_podcasts () {
                     cd $INCOMING
                     wget $WGET_QUIET -c -T $WGET_TIMEOUT -O "$FILENAME" \
                         "$DLURL"
+                    ((NEWDL=NEWDL+1))
                     mv "$FILENAME" $BASEDIR/$DATADIR/"$FILENAME"
+                    if [ $SYNC = "1" ]; then
+                        crunch "Syncing $FILENAME to $SYNCDIR"
+                        rsync -az $BASEDIR/$DATADIR $SYNCDIR
+                    fi
                     cd $BASEDIR
                 fi
             fi
             ((COUNTER=COUNTER+1))
         done
         # Create an m3u playlist:
-        if [ "$DLNUM" != "update" ]; then
+        if [[ "$DLNUM" != "update" && $NEWDL -gt 0 ]]; then
             if [ -n "$M3U" ]; then
                 if verbose; then
-                    crunch "Creating $datadir m3u playlist."
+                    crunch "Creating $DATADIR m3u playlist."
                 fi
                 ls $DATADIR | grep -v m3u > $DATADIR/podcast.m3u
+                if [ $SYNC = "1" ]; then
+                    crunch "Syncing $DATADIR m3u playlist to $SYNCDIR"
+                    rsync -az $BASEDIR/$DATADIR $SYNCDIR
+                fi
             fi
         fi
         if verbose; then
@@ -330,6 +355,7 @@ final_cleanup () {
     rm -f $TEMPLOG
     rm -f $TEMPRSSFILE
     if verbose; then
+        echo "Total downloads: $NEWDL"
         echo "All done."
         if [ -e $SUMMARYLOG ]; then
             echo
@@ -343,7 +369,7 @@ final_cleanup () {
 
 # THIS IS THE ACTUAL START OF SCRIPT
 # Here are the command line switches
-while getopts ":c:d:fmuvh" OPT ;do
+while getopts ":c:d:fmsuvh" OPT ;do
     case $OPT in
         c )         RSSFILE="$OPTARG"
                     ;;
@@ -352,6 +378,8 @@ while getopts ":c:d:fmuvh" OPT ;do
         f )         FIRST_ONLY=1
                     ;;
         m )         M3U=1
+                    ;;
+        s )         SYNC=1
                     ;;
         u )         UPDATE=1
                     ;;
@@ -371,6 +399,8 @@ Options are:
 -h              Display this help message.
 
 -m              Create m3u playlists.
+
+-s              Sync with media player (must set SYNCDIR in script).
 
 -u              Override mp.conf and only update (mark downloaded).
 
