@@ -11,7 +11,8 @@
 ### START USER CONFIGURATION
 # Default values can be set here. Command-line flags override some of these.
 
-# BASEDIR: Location of podcast directories
+# BASEDIR: Location of podcast directories.  If you have an escaped space in
+# the directory name be sure to keep the double quotes.
 BASEDIR="$HOME/podcasts"
 
 # DATESTRING: Valid date format for date-based archiving.  Default is
@@ -25,10 +26,10 @@ RSSFILE="$BASEDIR/mp.conf"
 PARSE_ENCLOSURE="$BASEDIR/parse_enclosure.xsl"
 
 # FIRST_ONLY: Default '' means look to mp.conf on whether to download or
-# update; 1 will override mp.conf and download the newest episode
+# update; 1 will override mp.conf and download the newest episode.
 FIRST_ONLY=''
 
-# M3U: Default '' means no m3u playlist created; 1 will create m3u playlist
+# M3U: Default '' means no m3u playlist created; 1 will create m3u playlist.
 M3U=''
 
 # UPDATE: Default '' means look to mp.conf on whether to download or update; 1
@@ -36,10 +37,11 @@ M3U=''
 # will be marked as downloaded but not actually downloaded).
 UPDATE=''
 
-# VERBOSE: Default '' is quiet output; 1 is verbose
+# VERBOSE: Default '' is quiet output; 1 is verbose.
 VERBOSE=''
 
-# WGET_QUIET: Default is '-q' for quiet wget output; change to '' for wget output
+# WGET_QUIET: Default is '-q' for quiet wget output; change to '' for wget
+# output.
 WGET_QUIET='-q'
 
 # WGET_TIMEOUT: Default is 30 seconds; can decrease or increase if some files
