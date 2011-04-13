@@ -12,7 +12,7 @@
 # Default values can be set here. Command-line flags override some of these.
 
 # BASEDIR: Location of podcast directories
-BASEDIR="$HOME/my podcasts"
+BASEDIR="$HOME/podcasts"
 
 # DATESTRING: Valid date format for date-based archiving.  Default is
 # '%Y%m%d'.  Can be changed to other valid formats.  See man date.
