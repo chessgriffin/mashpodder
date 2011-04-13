@@ -50,13 +50,12 @@ WGET_TIMEOUT='30'
 
 # SYNC: Sync (via rsync) new downloads with media player: Default '' will not
 # sync; 1 will sync - need to also set SYNCDIR.
-SYNC='1'
+SYNC=''
 
 # SYNCDIR: Set mountpoint or path where new episodes should be synced.  Must
 # be writable by user executing this script.  Again, use double quotes if
 # there is an escaped space.
-#SYNCDIR="/mnt/device/podcasts"
-SYNCDIR="/home/chess/sync"
+SYNCDIR="/mnt/device/podcasts"
 
 ### END USER CONFIGURATION
 
