@@ -356,7 +356,7 @@ while getopts ":c:d:fmuvh" OPT ;do
         v )         VERBOSE=1
                     ;;
         h|* )       cat << EOF
-$SCRIPT $VER 2009-03-05
+$SCRIPT $VER
 Usage: $0 [OPTIONS] <arguments>
 Options are:
 
