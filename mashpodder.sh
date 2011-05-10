@@ -49,7 +49,8 @@ WGET_QUIET='-q'
 WGET_TIMEOUT='30'
 
 # SYNC: Sync (via rsync) new downloads with media player: Default '' will not
-# sync; 1 will sync - need to also set SYNCDIR.
+# sync; 1 will sync - need to also set SYNCDIR.  THIS FEATURE IS STILL IN
+# BETA - PLEASE BE CAREFUL AND TEST.
 SYNC=''
 
 # SYNCDIR: Set mountpoint or path where new episodes should be synced.  Must
