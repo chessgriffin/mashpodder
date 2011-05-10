@@ -197,7 +197,7 @@ fix_url () {
 
     # Get the filename
     FIRSTFILENAME=$(echo $FIXURL|awk -F / '{print $NF}')
-    FILENAME=$(echo $FIRSTFILENAME|awk -F ? '{print $1}')
+    FILENAME=$(echo $FIRSTFILENAME|awk -F "?" '{print $1}')
 
     # Remove parentheses in filenames
     FILENAME=$(echo $FILENAME | tr -d "()")
