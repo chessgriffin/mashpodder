@@ -311,7 +311,7 @@ fetch_podcasts () {
                         "$DLURL"
                     ((NEWDL=NEWDL+1))
                     mv "$FILENAME" $BASEDIR/$DATADIR/"$FILENAME"
-                    if [ $SYNC = "1" ]; then
+                    if [ "$SYNC" = "1" ]; then
                         crunch "Syncing $FILENAME to $SYNCDIR"
                         rsync -az $BASEDIR/$DATADIR $SYNCDIR
                     fi
@@ -327,7 +327,7 @@ fetch_podcasts () {
                     crunch "Creating $DATADIR m3u playlist."
                 fi
                 ls $DATADIR | grep -v m3u > $DATADIR/podcast.m3u
-                if [ $SYNC = "1" ]; then
+                if [ "$SYNC" = "1" ]; then
                     crunch "Syncing $DATADIR m3u playlist to $SYNCDIR"
                     rsync -az $BASEDIR/$DATADIR $SYNCDIR
                 fi
