@@ -2,7 +2,7 @@
 #
 # $Id$
 #
-# Mashpodder by Chess Griffin <chess@chessgriffin.com>
+# Mashpodder by Chess Griffin <chess.griffin@gmail.com>
 # Copyright 2009-2011
 # Licensed under the GPLv3
 #
