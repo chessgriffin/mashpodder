@@ -3,7 +3,7 @@
 # $Id$
 #
 # Mashpodder by Chess Griffin <chess.griffin@gmail.com>
-# Copyright 2009-2011
+# Copyright 2009-2012
 # Licensed under the GPLv3
 #
 # Originally based on BashPodder by Linc Fessenden 12/1/2004
