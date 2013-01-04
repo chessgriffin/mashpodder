@@ -10,9 +10,8 @@
 # executable, change the necessary settings, and set a cron job, e.g.:
 # 02 01 * * * /home/user/bin/sample-wrapper-for-cron.sh
 
-# BASEDIR: Location of podcast directories (also usually where mashpodder and
-# related files are located)
-BASEDIR=$HOME/podcasts
+# BASEDIR: Location of mashpodder and related files are located
+BASEDIR=$HOME/mashpodder
 
 # DAILYLOG/PERMLOG: Location and name of daily and permanent log files
 DAILYLOG=$BASEDIR/dailypodcastlog.txt
