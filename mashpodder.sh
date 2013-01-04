@@ -3,55 +3,89 @@
 # $Id$
 #
 # Mashpodder by Chess Griffin <chess.griffin@gmail.com>
-# Copyright 2009-2012
+# Copyright 2009-2013
 # Licensed under the GPLv3
 #
 # Originally based on BashPodder by Linc Fessenden 12/1/2004
 
 ### START USER CONFIGURATION
-# Default values can be set here. Command-line flags override some of these.
+# Default values can be set here. Command-line flags can override some of
+# these but not all of them.
 
-# BASEDIR: Location of podcast directories.  If you have an escaped space in
-# the directory name be sure to keep the double quotes.
-BASEDIR="$HOME/podcasts"
+# BASEDIR: Base location of the script and related files.  If you have an
+# escaped space in the directory name be sure to keep the double quotes.
+# Default is "$HOME/mashpodder".  This is commented out on purpose to start
+# with in order to force the user to review this USER CONFIGURATION section
+# and set the various options. Uncomment and set to desired path.
+#BASEDIR="$HOME/mashpodder"
 
-# DATESTRING: Valid date format for date-based archiving.  Default is
-# '%Y%m%d'.  Can be changed to other valid formats.  See man date.
-DATESTRING='%Y%m%d'
+# PODCASTDIR: Location of podcast directories listed in mp.conf.  If you have
+# an escaped space in the directory name be sure to keep the double quotes.
+# Default is "$BASEDIR/podcasts".  Thanks to startrek.steve for reporting the
+# issues that led to these directory changes.
+PODCASTDIR="$BASEDIR/podcasts"
 
-#RSSFILE: Default is 'mp.conf.'  Can be changed to another file name.
+# TMPDIR: Location of temp logs, where files are temporarily downloaded to,
+# and other bits.  If you have an escaped space in the directory name be sure
+# to keep the double quotes.  Default is "$BASEDIR/tmp".
+TMPDIR="$BASEDIR/tmp"
+
+# DATESTRING: Valid date format for date-based archiving.  Can be changed to
+# other valid formats.  See man date.  Default is "%Y%m%d".
+DATESTRING="%Y%m%d"
+
+# RSSFILE: Location of mp.conf file.  Can be changed to another file name.
+# Default is "$BASEDIR/mp.conf".
 RSSFILE="$BASEDIR/mp.conf"
 
-#PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.
+# PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.  Default is
+# "$BASEDIR/parse_enclosure.xsl".
 PARSE_ENCLOSURE="$BASEDIR/parse_enclosure.xsl"
 
-# FIRST_ONLY: Default '' means look to mp.conf on whether to download or
-# update; 1 will override mp.conf and download the newest episode.
-FIRST_ONLY=''
+# PODLOG: This is a critical file.  This is the file that saves the name of
+# every file downloaded (or checked with the 'update' option in mp.conf.)  If
+# you lose this file then mashpodder should be able to automatically recreate
+# it during the next run, but it's still a good idea to make sure the file is
+# kept in a safe place.  Default is "$BASEDIR/podcast.log".
+PODLOG="$BASEDIR/podcast.log"
 
-# M3U: Default '' means no m3u playlist created; 1 will create m3u playlist.
-M3U=''
+# PODLOG_BACKUP: Setting this option to "1" will create a date-stamped backup
+# of your podcast.log file before new podcast files are downloaded.  The
+# filename will be $PODLOG.$DATESTRING (see above variables).  If you enable
+# this, you'll want to monitor the number of backups and manually remove old
+# copies.  Default is "".
+PODLOG_BACKUP=""
 
-# UPDATE: Default '' means look to mp.conf on whether to download or update; 1
-# will override mp.conf and cause all feeds to be updated (meaning episodes
-# will be marked as downloaded but not actually downloaded).
-UPDATE=''
+# FIRST_ONLY: Default "" means look to mp.conf for whether to download or
+# update; "1" will override mp.conf and download the newest episode.
+FIRST_ONLY=""
 
-# VERBOSE: Default '' is quiet output; 1 is verbose.
-VERBOSE=''
+# M3U: Default "" means no m3u playlist created; "1" will create m3u playlist.
+M3U=""
 
-# WGET_QUIET: Default is '-q' for quiet wget output; change to '' for wget
+# UPDATE: Default "" means look to mp.conf on whether to download or update;
+# "1" will override mp.conf and cause all feeds to be updated (meaning
+# episodes will be marked as downloaded but not actually downloaded).
+UPDATE=""
+
+# VERBOSE: Default "" is quiet output; "1" is verbose.
+VERBOSE=""
+
+# WGET_QUIET: Default is "-q" for quiet wget output; change to "" for wget
 # output.
-WGET_QUIET='-q'
+WGET_QUIET="-q"
 
 # WGET_TIMEOUT: Default is 30 seconds; can decrease or increase if some files
 # are cut short. Thanks to Phil Smith for the bug report.
-WGET_TIMEOUT='30'
+WGET_TIMEOUT="30"
 
-# SYNC: Sync (via rsync) new downloads with media player: Default '' will not
-# sync; 1 will sync - need to also set SYNCDIR.  THIS FEATURE IS STILL IN
-# BETA - PLEASE BE CAREFUL AND TEST.
-SYNC=''
+# SYNC: Sync (via rsync) new downloads with media player: Default "" will not
+# sync; "1" will sync - need to also set SYNCDIR.  THIS FEATURE IS STILL IN
+# BETA - PLEASE BE CAREFUL AND TEST.  I am thinking about removing this
+# feature because I don't think it's really necessary and can be handled in
+# a wrapper script.  Please let me know if you use it otherwise I might take
+# it out at any time..
+SYNC=""
 
 # SYNCDIR: Set mountpoint or path where new episodes should be synced.  Must
 # be writable by user executing this script.  Again, use double quotes if
@@ -66,11 +100,9 @@ SCRIPT=${0##*/}
 REV="$Revision$"
 VER=svn_r$(cut -d' ' -f2 <<< "$REV")
 CWD=$(pwd)
-INCOMING="$BASEDIR/incoming"
-TEMPLOG="$BASEDIR/temp.log"
-PODLOG="$BASEDIR/podcast.log"
-SUMMARYLOG="$BASEDIR/summary.log"
-TEMPRSSFILE="$BASEDIR/mp.conf.temp"
+TEMPLOG="$TMPDIR/temp.log"
+SUMMARYLOG="$TMPDIR/summary.log"
+TEMPRSSFILE="$TMPDIR/mp.conf.temp"
 OLDIFS=$IFS
 IFS=$'\n'
 
@@ -89,6 +121,37 @@ verbose () {
 sanity_checks () {
     # Perform some basic checks
     local FEED ARCHIVETYPE DLNUM DATADIR
+
+    if [ -z $BASEDIR ]; then
+        crunch "\$BASEDIR has not been set.  Please review the USER \
+            CONFIGURATION section at the top of mashpodder.sh and set \
+            the various options."
+        exit 0
+    fi
+
+    if [ ! -e $BASEDIR ]; then
+        crunch "\$BASEDIR does not exist.  Please re-check the settings \
+            at the top of mashpodder.sh and try again."
+        exit 0
+    fi
+
+    cd $BASEDIR
+
+    # Make podcast directory if necessary
+    if [ ! -e $PODCASTDIR ]; then
+        if verbose; then
+            echo "Creating podcast directory."
+        fi
+        mkdir -p $PODCASTDIR
+    fi
+
+    # Make tmp directory if necessary
+    if [ ! -e $TMPDIR ]; then
+        if verbose; then
+            echo "Creating temporary directory."
+        fi
+        mkdir -p $TMPDIR
+    fi
 
     rm -f $TEMPRSSFILE
     touch $TEMPRSSFILE
@@ -147,6 +210,15 @@ sanity_checks () {
         echo "$FEED $DATADIR $DLNUM" >> $TEMPRSSFILE
     done < $RSSFILE
 
+    # Backup the $PODLOG if $PODLOG_BACKUP=1
+    if [ "$PODLOG_BACKUP" = "1" ]; then
+        if verbose; then
+            echo "Backing up the $PODLOG file."
+        fi
+        NEWPODLOG="$PODLOG.$(date +$DATESTRING)"
+        cp $PODLOG $NEWPODLOG
+    fi
+
     # Check to make sure SYNCDIR exists if SYNC=1
     if [ "$SYNC" = "1" ]; then
         if [ ! -d "$SYNCDIR" ]; then
@@ -168,14 +240,6 @@ initial_setup () {
         echo
     fi
 
-    # Make incoming temp folder if necessary
-    if [ ! -e $INCOMING ]; then
-        if verbose; then
-            echo "Creating temp folders."
-        fi
-    mkdir -p $INCOMING
-    fi
-
     # Delete the temp log:
     rm -f $TEMPLOG
     touch $TEMPLOG
@@ -190,8 +254,7 @@ initial_setup () {
 }
 
 fix_url () {
-    # Take a url embedded in a feed and perform some fixes; also
-    # get the filename
+    # Take a url embedded in a feed, get the filename, and perform some fixes
     local FIXURL
 
     FIXURL=$1
@@ -242,10 +305,10 @@ fix_url () {
 
 check_directory () {
     # Check to see if DATADIR exists and if not, create it
-    if [ ! -e $DATADIR ]; then
-        crunch "The directory $DATADIR for $FEED does not exist. Creating \
-            now..."
-        mkdir -p $DATADIR
+    if [ ! -e $PODCASTDIR/$DATADIR ]; then
+        crunch "The directory $PODCASTDIR/$DATADIR for $FEED does not \
+            exist.  Creating now..."
+        mkdir -p $PODCASTDIR/$DATADIR
     fi
     return 0
 }
@@ -279,7 +342,11 @@ fetch_podcasts () {
 
         FILE=$(wget -q $FEED -O - | \
             xsltproc $PARSE_ENCLOSURE - 2> /dev/null) || \
-            FILE=$(wget -q $FEED -O - | tr '\r' '\n' | tr \' \" | \
+            # Let's try the diff from turbooster as reported in Issue 13.
+            # If it causes problems, uncomment the next line and comment
+            # out the one after that (the one with "grep url=" in it.
+            #FILE=$(wget -q $FEED -O - | tr '\r' '\n' | tr \' \" | \
+            FILE=$(wget -q $FEED -O - | grep url= | \
             sed -n 's/.*url="\([^"]*\)".*/\1/p')
 
         for URL in $FILE; do
@@ -299,21 +366,22 @@ fetch_podcasts () {
                     fi
                     continue
                 fi
-                check_directory $DATADIR
-                if [ ! -e $DATADIR/"$FILENAME" ]; then
+                #check_directory $DATADIR
+                check_directory
+                if [ ! -e $PODCASTDIR/$DATADIR/"$FILENAME" ]; then
                     if verbose; then
                         crunch "NEW:  Fetching $FILENAME and saving in \
                             directory $DATADIR."
                         echo "$FILENAME downloaded to $DATADIR" >> $SUMMARYLOG
                     fi
-                    cd $INCOMING
+                    cd $TMPDIR
                     wget $WGET_QUIET -c -T $WGET_TIMEOUT -O "$FILENAME" \
                         "$DLURL"
                     ((NEWDL=NEWDL+1))
-                    mv "$FILENAME" $BASEDIR/$DATADIR/"$FILENAME"
+                    mv "$FILENAME" $PODCASTDIR/$DATADIR/"$FILENAME"
                     if [ "$SYNC" = "1" ]; then
                         crunch "Syncing $FILENAME to $SYNCDIR"
-                        rsync -az $BASEDIR/$DATADIR $SYNCDIR
+                        rsync -az $PODCASTDIR/$DATADIR $SYNCDIR
                     fi
                     cd $BASEDIR
                 fi
@@ -321,15 +389,17 @@ fetch_podcasts () {
             ((COUNTER=COUNTER+1))
         done
         # Create an m3u playlist:
-        if [[ "$DLNUM" != "update" && $NEWDL -gt 0 ]]; then
+        #if [[ "$DLNUM" != "update" && $NEWDL -gt 0 ]]; then
+        if [[ "$DLNUM" != "update" ]]; then
             if [ -n "$M3U" ]; then
                 if verbose; then
                     crunch "Creating $DATADIR m3u playlist."
                 fi
-                ls $DATADIR | grep -v m3u > $DATADIR/podcast.m3u
+                ls $PODCASTDIR/$DATADIR | grep -v m3u > \
+                    $PODCASTDIR/$DATADIR/podcast.m3u
                 if [ "$SYNC" = "1" ]; then
                     crunch "Syncing $DATADIR m3u playlist to $SYNCDIR"
-                    rsync -az $BASEDIR/$DATADIR $SYNCDIR
+                    rsync -az $PODCASTDIR/$DATADIR $SYNCDIR
                 fi
             fi
         fi
@@ -346,7 +416,7 @@ fetch_podcasts () {
 }
 
 final_cleanup () {
-    # Delete temp files, create the log files and clean up
+    # Delete temp files, create the log files, and clean up
     if verbose; then
         crunch "Cleaning up."
     fi
@@ -365,12 +435,19 @@ final_cleanup () {
         fi
         echo "################################"
     fi
+    # These next 2 lines were moved here so if the user kills the program
+    # with ctrl-C (see the trap code, below), they will also cd to cwd before
+    # exiting.
+    cd $CWD
+    IFS=$OLDIFS
 }
 
 # THIS IS THE ACTUAL START OF SCRIPT
 # Here are the command line switches
-while getopts ":c:d:fmsuvh" OPT ;do
+while getopts ":bc:d:fmsuvh" OPT ;do
     case $OPT in
+        b )         PODLOG_BACKUP=1
+                    ;;
         c )         RSSFILE="$OPTARG"
                     ;;
         d )         DATESTRING="$OPTARG"
@@ -390,11 +467,13 @@ $SCRIPT $VER
 Usage: $0 [OPTIONS] <arguments>
 Options are:
 
+-b              Create a date-stamped backup of the podcast.log file.
+
 -c <filename>   Use a different config file other than mp.conf.
 
--d <date>       Valid date string for date-based archiving.
+-d <date>       Valid date string for date-based archiving.  See man date.
 
--f              Override mp.conf and download the first newest episode.
+-f              Override mp.conf and download the first new episode.
 
 -h              Display this help message.
 
@@ -409,9 +488,12 @@ Options are:
 mp.conf is the standard configuration file.  Please see the sample mp.conf for
 how this file is to be configured.
 
-Some of the default settings can be set permanently at the top of the script
-in the 'USER CONFIGURATION' section or temporarily by passing a command
-line switch.
+Some -- but not all -- of the default settings can be set permanently at the
+top of the script in the 'USER CONFIGURATION' section or temporarily by passing
+a command line switch.  The 'USER CONFIGURATION' section also has additional
+things you can set that do not have compatible command-line switches.
+
+Therefore, reading mashpodder.sh is recommended.
 
 EOF
                     exit 0
@@ -420,13 +502,22 @@ EOF
 done
 
 # End of option parsing
+
 shift $(($OPTIND - 1))
 
-cd $BASEDIR
+# Trap ctrl-C's and other interrupts, clean up temp files, and exit cleanly.
+# Thanks to mr.gaga for the report.
+for sig in INT TERM HUP; do
+    trap "
+    echo
+    echo signal $sig recived
+    final_cleanup
+    exit 0" $sig;
+done
+
 sanity_checks
 initial_setup
 fetch_podcasts
 final_cleanup
-cd $CWD
-IFS=$OLDIFS
+
 exit 0
