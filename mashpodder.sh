@@ -120,7 +120,7 @@ verbose () {
 
 sanity_checks () {
     # Perform some basic checks
-    local FEED ARCHIVETYPE DLNUM DATADIR
+    local FEED ARCHIVETYPE DLNUM DATADIR NEWPODLOG
 
     if [ -z $BASEDIR ]; then
         crunch "\$BASEDIR has not been set.  Please review the USER \
@@ -366,7 +366,6 @@ fetch_podcasts () {
                     fi
                     continue
                 fi
-                #check_directory $DATADIR
                 check_directory
                 if [ ! -e $PODCASTDIR/$DATADIR/"$FILENAME" ]; then
                     if verbose; then
@@ -389,7 +388,6 @@ fetch_podcasts () {
             ((COUNTER=COUNTER+1))
         done
         # Create an m3u playlist:
-        #if [[ "$DLNUM" != "update" && $NEWDL -gt 0 ]]; then
         if [[ "$DLNUM" != "update" ]]; then
             if [ -n "$M3U" ]; then
                 if verbose; then
