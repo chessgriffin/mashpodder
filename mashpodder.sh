@@ -60,8 +60,17 @@ PODLOG_BACKUP=""
 # update; "1" will override mp.conf and download the newest episode.
 FIRST_ONLY=""
 
-# M3U: Default "" means no m3u playlist created; "1" will create m3u playlist.
-M3U=""
+# M3U: Default "" means no m3u playlist created; "1" will create m3u
+# playlists in each podcast's directory listing all the files in that
+# directory.
+M3U="1"
+
+# DAILY_PLAYLIST: Default "" means no daily m3u playlist created; "1" will
+# create an m3u playlist in $PODCASTDIR listing all newly downloaded shows.
+# The m3u filename will have the $DATESTRING prepended to it and additional
+# new downloads for that day will be added to the file.  NOTE: $M3U must also
+# be set to "1" for this to work.
+DAILY_PLAYLIST=""
 
 # UPDATE: Default "" means look to mp.conf on whether to download or update;
 # "1" will override mp.conf and cause all feeds to be updated (meaning
@@ -84,7 +93,7 @@ WGET_TIMEOUT="30"
 # BETA - PLEASE BE CAREFUL AND TEST.  I am thinking about removing this
 # feature because I don't think it's really necessary and can be handled in
 # a wrapper script.  Please let me know if you use it otherwise I might take
-# it out at any time..
+# it out at any time.
 SYNC=""
 
 # SYNCDIR: Set mountpoint or path where new episodes should be synced.  Must
@@ -103,6 +112,7 @@ CWD=$(pwd)
 TEMPLOG="$TMPDIR/temp.log"
 SUMMARYLOG="$TMPDIR/summary.log"
 TEMPRSSFILE="$TMPDIR/mp.conf.temp"
+DAILYPLAYLIST="$PODCASTDIR/$(date +$DATESTRING)_daily_playlist.m3u"
 OLDIFS=$IFS
 IFS=$'\n'
 
@@ -383,11 +393,18 @@ fetch_podcasts () {
                         rsync -az $PODCASTDIR/$DATADIR $SYNCDIR
                     fi
                     cd $BASEDIR
+                    if [[ -n "$M3U" && -n "$DAILY_PLAYLIST" ]]; then
+                        if verbose; then
+                            echo "Adding "$FILENAME" to daily playlist."
+                        fi
+                        echo /$DATADIR/"$FILENAME" >> $DAILYPLAYLIST
+                    fi
                 fi
             fi
             ((COUNTER=COUNTER+1))
         done
         # Create an m3u playlist:
+        #if [[ "$DLNUM" != "update" && $NEWDL -gt 0 ]]; then
         if [[ "$DLNUM" != "update" ]]; then
             if [ -n "$M3U" ]; then
                 if verbose; then
@@ -421,6 +438,11 @@ final_cleanup () {
     cat $PODLOG >> $TEMPLOG
     sort $TEMPLOG | uniq > $PODLOG
     rm -f $TEMPLOG
+    if [ -e $DAILYPLAYLIST ]; then
+        cat $DAILYPLAYLIST >> $TEMPLOG
+        sort $TEMPLOG | uniq > $DAILYPLAYLIST
+        rm -f $TEMPLOG
+    fi
     rm -f $TEMPRSSFILE
     if verbose; then
         echo "Total downloads: $NEWDL"
