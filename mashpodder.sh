@@ -397,7 +397,7 @@ fetch_podcasts () {
                         if verbose; then
                             echo "Adding "$FILENAME" to daily playlist."
                         fi
-                        echo /$DATADIR/"$FILENAME" >> $DAILYPLAYLIST
+                        echo $DATADIR/"$FILENAME" >> $DAILYPLAYLIST
                     fi
                 fi
             fi
