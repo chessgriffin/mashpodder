@@ -380,7 +380,7 @@ fetch_podcasts () {
                     fi
                     continue
                 fi
-                check_directory
+                check_directory $DATADIR
                 if [ ! -e $PODCASTDIR/$DATADIR/"$FILENAME" ]; then
                     if verbose; then
                         crunch "NEW:  Fetching $FILENAME and saving in \
