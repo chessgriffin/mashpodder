@@ -16,18 +16,21 @@
 # escaped space in the directory name be sure to keep the double quotes.
 # Default is "$HOME/mashpodder".  This is commented out on purpose to start
 # with in order to force the user to review this USER CONFIGURATION section
-# and set the various options. Uncomment and set to desired path.
+# and set the various options. Uncomment and set to desired path.  Mashpodder
+# will not create this directory for you.
 #BASEDIR="$HOME/mashpodder"
 
 # PODCASTDIR: Location of podcast directories listed in mp.conf.  If you have
 # an escaped space in the directory name be sure to keep the double quotes.
 # Default is "$BASEDIR/podcasts".  Thanks to startrek.steve for reporting the
-# issues that led to these directory changes.
+# issues that led to these directory changes.  Mashpodder will create this
+# directory if it does not exist.
 PODCASTDIR="$BASEDIR/podcasts"
 
 # TMPDIR: Location of temp logs, where files are temporarily downloaded to,
 # and other bits.  If you have an escaped space in the directory name be sure
-# to keep the double quotes.  Default is "$BASEDIR/tmp".
+# to keep the double quotes.  Mashpodder will create this directory if it does
+# not exist.  Default is "$BASEDIR/tmp".
 TMPDIR="$BASEDIR/tmp"
 
 # DATESTRING: Valid date format for date-based archiving.  Can be changed to
@@ -135,7 +138,7 @@ sanity_checks () {
     if [ -z $BASEDIR ]; then
         crunch "\$BASEDIR has not been set.  Please review the USER \
             CONFIGURATION section at the top of mashpodder.sh and set \
-            the various options."
+            \$BASEDIR and any other applicable options."
         exit 0
     fi
 
