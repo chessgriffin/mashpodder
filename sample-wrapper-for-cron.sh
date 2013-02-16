@@ -3,8 +3,8 @@
 # This is a sample script to run mashpodder from a cron job.  There are many
 # better ways to do this; this is just an example.  This script will capture
 # the mashpodder output into a dailypodcastlog.txt file, which is overwritten
-# each day, and will then append this daily log into the permpodcastlog.txt to
-# create a permanent record.
+# each day, and will then append this daily log into the permpodcastlog.txt
+# to create a permanent record.
 #
 # USAGE: save this script somewhere convenient, e.g. $HOME/bin, make it
 # executable, change the necessary settings, and set a cron job, e.g.:
