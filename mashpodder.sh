@@ -66,7 +66,7 @@ FIRST_ONLY=""
 # M3U: Default "" means no m3u playlist created; "1" will create m3u
 # playlists in each podcast's directory listing all the files in that
 # directory.
-M3U="1"
+M3U=""
 
 # DAILY_PLAYLIST: Default "" means no daily m3u playlist created; "1" will
 # create an m3u playlist in $PODCASTDIR listing all newly downloaded shows.
