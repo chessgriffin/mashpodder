@@ -5,7 +5,7 @@ podcatching client based on BashPodder
 
 Starting in 2005, I have maintained a 'user-contributed' version of BashPodder, the great podcatcher originally written by Linc Fessenden. My mashup has become pretty popular, and I have maintained five separate releases since that time.
 
-I ended up rewriting much of my original mashup and so when version 0.6 was ready, I decided to rename my version 'mashpodder' (as it is a mashup of BashPodder? and other stuff) and put it on Google Code.  I eventually moved it to GitHub.
+I ended up rewriting much of my original mashup and so when version 0.6 was ready, I decided to rename my version 'mashpodder' (as it is a mashup of BashPodder and other stuff) and put it on Google Code.  I eventually moved it to GitHub.
 
 Mashpodder allows the user to download podcast episodes. The user can choose to save these episodes in a named directory (i.e. separate directory per feed) or in a date-based directory, so the most recent episodes are in one folder. Or, the user can combine this by having some podcasts in a named directory and others in the date-based directory. The user can choose to download all, none, or a set number of episodes per feed. The user can also choose to mark the episodes as downloaded (without actually downloading them) which can be used to 'catch up' to a podcast.
 
