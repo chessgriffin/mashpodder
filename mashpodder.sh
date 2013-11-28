@@ -1,7 +1,5 @@
 #!/bin/bash
 #
-# $Id$
-#
 # Mashpodder by Chess Griffin <chess.griffin@gmail.com>
 # Copyright 2009-2013
 #
@@ -124,8 +122,6 @@ SYNCDIR="/mnt/device/podcasts"
 ### No changes should be necessary below this line
 
 SCRIPT=${0##*/}
-REV="$Revision$"
-VER=svn_r$(cut -d' ' -f2 <<< "$REV")
 CWD=$(pwd)
 TEMPLOG="$TMPDIR/temp.log"
 SUMMARYLOG="$TMPDIR/summary.log"
@@ -503,7 +499,7 @@ while getopts ":bc:d:fmsuvh" OPT ;do
         v )         VERBOSE=1
                     ;;
         h|* )       cat << EOF
-$SCRIPT $VER
+$SCRIPT
 Usage: $0 [OPTIONS] <arguments>
 Options are:
 
