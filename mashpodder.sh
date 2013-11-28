@@ -4,10 +4,24 @@
 #
 # Mashpodder by Chess Griffin <chess.griffin@gmail.com>
 # Copyright 2009-2013
-# Licensed under the GPLv3
 #
 # Originally based on BashPodder by Linc Fessenden 12/1/2004
-
+#
+# Redistributions of this script must retain the above copyright notice,
+# this list of conditions and the following disclaimer.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
+#  IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+#  DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+#  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+#  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+#  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+#  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+#  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
 ### START USER CONFIGURATION
 # Default values can be set here. Command-line flags can override some of
 # these but not all of them.
@@ -16,25 +30,25 @@
 # escaped space in the directory name be sure to keep the double quotes.
 # Default is "$HOME/mashpodder".  This is commented out on purpose to start
 # with in order to force the user to review this USER CONFIGURATION section
-# and set the various options. Uncomment and set to desired path.  Mashpodder
-# will not create this directory for you.
+# and set the various options. Uncomment and set to desired path.
+# Mashpodder will not create this directory for you.
 #BASEDIR="$HOME/mashpodder"
 
-# PODCASTDIR: Location of podcast directories listed in mp.conf.  If you have
-# an escaped space in the directory name be sure to keep the double quotes.
-# Default is "$BASEDIR/podcasts".  Thanks to startrek.steve for reporting the
-# issues that led to these directory changes.  Mashpodder will create this
-# directory if it does not exist.
+# PODCASTDIR: Location of podcast directories listed in mp.conf.  If you
+# have an escaped space in the directory name be sure to keep the double
+# quotes.  Default is "$BASEDIR/podcasts".  Thanks to startrek.steve for
+# reporting the issues that led to these directory changes.  Mashpodder
+# will create this directory if it does not exist.
 PODCASTDIR="$BASEDIR/podcasts"
 
 # TMPDIR: Location of temp logs, where files are temporarily downloaded to,
-# and other bits.  If you have an escaped space in the directory name be sure
-# to keep the double quotes.  Mashpodder will create this directory if it does
-# not exist.  Default is "$BASEDIR/tmp".
+# and other bits.  If you have an escaped space in the directory name be
+# sure to keep the double quotes.  Mashpodder will create this directory if
+# it does not exist.  Default is "$BASEDIR/tmp".
 TMPDIR="$BASEDIR/tmp"
 
-# DATESTRING: Valid date format for date-based archiving.  Can be changed to
-# other valid formats.  See man date.  Default is "%Y%m%d".
+# DATESTRING: Valid date format for date-based archiving.  Can be changed
+# to other valid formats.  See man date.  Default is "%Y%m%d".
 DATESTRING="%Y%m%d"
 
 # RSSFILE: Location of mp.conf file.  Can be changed to another file name.
@@ -46,17 +60,17 @@ RSSFILE="$BASEDIR/mp.conf"
 PARSE_ENCLOSURE="$BASEDIR/parse_enclosure.xsl"
 
 # PODLOG: This is a critical file.  This is the file that saves the name of
-# every file downloaded (or checked with the 'update' option in mp.conf.)  If
-# you lose this file then mashpodder should be able to automatically recreate
-# it during the next run, but it's still a good idea to make sure the file is
-# kept in a safe place.  Default is "$BASEDIR/podcast.log".
+# every file downloaded (or checked with the 'update' option in mp.conf.)
+# If you lose this file then mashpodder should be able to automatically
+# recreate it during the next run, but it's still a good idea to make sure
+# the file is kept in a safe place.  Default is "$BASEDIR/podcast.log".
 PODLOG="$BASEDIR/podcast.log"
 
-# PODLOG_BACKUP: Setting this option to "1" will create a date-stamped backup
-# of your podcast.log file before new podcast files are downloaded.  The
-# filename will be $PODLOG.$DATESTRING (see above variables).  If you enable
-# this, you'll want to monitor the number of backups and manually remove old
-# copies.  Default is "".
+# PODLOG_BACKUP: Setting this option to "1" will create a date-stamped
+# backup of your podcast.log file before new podcast files are downloaded.
+# The filename will be $PODLOG.$DATESTRING (see above variables).  If you
+# enable this, you'll want to monitor the number of backups and manually
+# remove old copies.  Default is "".
 PODLOG_BACKUP=""
 
 # FIRST_ONLY: Default "" means look to mp.conf for whether to download or
@@ -69,15 +83,16 @@ FIRST_ONLY=""
 M3U=""
 
 # DAILY_PLAYLIST: Default "" means no daily m3u playlist created; "1" will
-# create an m3u playlist in $PODCASTDIR listing all newly downloaded shows.
-# The m3u filename will have the $DATESTRING prepended to it and additional
-# new downloads for that day will be added to the file.  NOTE: $M3U must also
-# be set to "1" for this to work.
+# create an m3u playlist in $PODCASTDIR listing all newly downloaded
+# shows.  The m3u filename will have the $DATESTRING prepended to it and
+# additional new downloads for that day will be added to the file.  NOTE:
+# $M3U must also be set to "1" for this to work.
 DAILY_PLAYLIST=""
 
-# UPDATE: Default "" means look to mp.conf on whether to download or update;
-# "1" will override mp.conf and cause all feeds to be updated (meaning
-# episodes will be marked as downloaded but not actually downloaded).
+# UPDATE: Default "" means look to mp.conf on whether to download or
+# update; "1" will override mp.conf and cause all feeds to be updated
+# (meaning episodes will be marked as downloaded but not actually
+# downloaded).
 UPDATE=""
 
 # VERBOSE: Default "" is quiet output; "1" is verbose.
@@ -87,21 +102,21 @@ VERBOSE=""
 # output.
 WGET_QUIET="-q"
 
-# WGET_TIMEOUT: Default is 30 seconds; can decrease or increase if some files
-# are cut short. Thanks to Phil Smith for the bug report.
+# WGET_TIMEOUT: Default is 30 seconds; can decrease or increase if some
+# files are cut short. Thanks to Phil Smith for the bug report.
 WGET_TIMEOUT="30"
 
-# SYNC: Sync (via rsync) new downloads with media player: Default "" will not
-# sync; "1" will sync - need to also set SYNCDIR.  THIS FEATURE IS STILL IN
-# BETA - PLEASE BE CAREFUL AND TEST.  I am thinking about removing this
-# feature because I don't think it's really necessary and can be handled in
-# a wrapper script.  Please let me know if you use it otherwise I might take
-# it out at any time.
+# SYNC: Sync (via rsync) new downloads with media player: Default "" will
+# not sync; "1" will sync - need to also set SYNCDIR.  THIS FEATURE IS
+# STILL IN BETA - PLEASE BE CAREFUL AND TEST.  I am thinking about removing
+# this feature because I don't think it's really necessary and can be
+# handled in a wrapper script.  Please let me know if you use it otherwise I
+# might take it out at any time.
 SYNC=""
 
-# SYNCDIR: Set mountpoint or path where new episodes should be synced.  Must
-# be writable by user executing this script.  Again, use double quotes if
-# there is an escaped space.
+# SYNCDIR: Set mountpoint or path where new episodes should be synced.
+# Must be writable by user executing this script.  Again, use double quotes
+# if there is an escaped space.
 SYNCDIR="/mnt/device/podcasts"
 
 ### END USER CONFIGURATION
@@ -268,7 +283,8 @@ initial_setup () {
 }
 
 fix_url () {
-    # Take a url embedded in a feed, get the filename, and perform some fixes
+    # Take a url embedded in a feed, get the filename, and perform some
+    # fixes
     local FIXURL
 
     FIXURL=$1
@@ -460,8 +476,8 @@ final_cleanup () {
         echo "################################"
     fi
     # These next 2 lines were moved here so if the user kills the program
-    # with ctrl-C (see the trap code, below), they will also cd to cwd before
-    # exiting.
+    # with ctrl-C (see the trap code, below), they will also cd to cwd
+    # before exiting.
     cd $CWD
     IFS=$OLDIFS
 }
