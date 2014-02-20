@@ -32,4 +32,11 @@ Note, you also need wget, curl, and xsltproc installed. They are usually
 included in most default distro installs or you can get them from your
 distro's repositories.
 
+Finally, about the Git repo: this is a tiny project so there will only be
+one branch, which is 'master' and that will contain the latest code and
+patches and testing bits.  It may or may not work at any given time.
+However, when it seems that the code is stable, I'll tag a release.  So,
+basically, if you want something stable, use the latest release.  If you
+want the latest-and-greatest or want to help test, use the master branch.
+
 Enjoy!
