@@ -23,7 +23,7 @@ to 'catch up' to a podcast.
 
 Three files are needed: mashpodder.sh, mp.conf, and parse-enclosure.xsl. All
 three of these files are available here in the mashpodder repository. You can
-also browse through the souce tree and download the files directly. There is
+also browse through the source tree and download the files directly. There is
 also a sample cron wrapper script that folks can use and modify. I will
 occasionally package up a simple tarball of these files to make it easier for
 folks to download.
