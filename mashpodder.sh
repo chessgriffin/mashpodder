@@ -62,7 +62,8 @@ DATEFILEDIR=""
 # TMPDIR: Location of temp logs, where files are temporarily downloaded to,
 # and other bits.  If you have an escaped space in the directory name be
 # sure to keep the double quotes.  Mashpodder will create this directory if
-# it does not exist.  Default is "$BASEDIR/tmp".
+# it does not exist but it will not be deleted on exit.  Default is
+# "$BASEDIR/tmp".
 TMPDIR="$BASEDIR/tmp"
 
 # DATESTRING: Valid date format for date-based archiving.  Can be changed
@@ -161,6 +162,15 @@ verbose () {
 sanity_checks () {
     # Perform some basic checks
     local FEED ARCHIVETYPE DLNUM DATADIR NEWPODLOG
+
+    # Print the date
+    if verbose; then
+        #echo
+        echo "################################"
+        echo "Starting mashpodder on"
+        date
+        echo
+    fi
 
     if [ -z $BASEDIR ]; then
         crunch "\$BASEDIR has not been set.  Please review the USER \
@@ -277,19 +287,6 @@ sanity_checks () {
             crunch "$SYNCDIR does not exist.  Exiting."
             exit 0
         fi
-    fi
-}
-
-initial_setup () {
-    # Get some things ready first
-
-    # Print the date
-    if verbose; then
-        echo
-        echo "################################"
-        echo "Starting mashpodder on"
-        date
-        echo
     fi
 
     # Delete the temp log:
@@ -579,7 +576,6 @@ for sig in INT TERM HUP; do
 done
 
 sanity_checks
-initial_setup
 fetch_podcasts
 final_cleanup
 
