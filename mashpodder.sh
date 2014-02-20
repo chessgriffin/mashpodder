@@ -121,19 +121,6 @@ WGET_QUIET="-q"
 # files are cut short. Thanks to Phil Smith for the bug report.
 WGET_TIMEOUT="30"
 
-# SYNC: Sync (via rsync) new downloads with media player: Default "" will
-# not sync; "1" will sync - need to also set SYNCDIR.  THIS FEATURE IS
-# STILL IN BETA - PLEASE BE CAREFUL AND TEST.  I am thinking about removing
-# this feature because I don't think it's really necessary and can be
-# handled in a wrapper script.  Please let me know if you use it otherwise I
-# might take it out at any time.
-SYNC=""
-
-# SYNCDIR: Set mountpoint or path where new episodes should be synced.
-# Must be writable by user executing this script.  Again, use double quotes
-# if there is an escaped space.
-SYNCDIR="/mnt/device/podcasts"
-
 ### END USER CONFIGURATION
 
 ### No changes should be necessary below this line
@@ -281,14 +268,6 @@ sanity_checks () {
         cp $PODLOG $NEWPODLOG
     fi
 
-    # Check to make sure SYNCDIR exists if SYNC=1
-    if [ "$SYNC" = "1" ]; then
-        if [ ! -d "$SYNCDIR" ]; then
-            crunch "$SYNCDIR does not exist.  Exiting."
-            exit 0
-        fi
-    fi
-
     # Delete the temp log:
     rm -f $TEMPLOG
     touch $TEMPLOG
@@ -428,10 +407,6 @@ fetch_podcasts () {
                         "$DLURL"
                     ((NEWDL=NEWDL+1))
                     mv "$FILENAME" $PODCASTDIR/$DATADIR/"$FILENAME"
-                    if [ "$SYNC" = "1" ]; then
-                        crunch "Syncing $FILENAME to $SYNCDIR"
-                        rsync -az $PODCASTDIR/$DATADIR $SYNCDIR
-                    fi
                     cd $BASEDIR
                     if [[ -n "$M3U" && -n "$DAILY_PLAYLIST" ]]; then
                         if verbose; then
@@ -452,10 +427,6 @@ fetch_podcasts () {
                 fi
                 ls $PODCASTDIR/$DATADIR | grep -v m3u > \
                     $PODCASTDIR/$DATADIR/podcast.m3u
-                if [ "$SYNC" = "1" ]; then
-                    crunch "Syncing $DATADIR m3u playlist to $SYNCDIR"
-                    rsync -az $PODCASTDIR/$DATADIR $SYNCDIR
-                fi
             fi
         fi
         if verbose; then
@@ -516,8 +487,6 @@ while getopts ":bc:d:fmsuvh" OPT ;do
                     ;;
         m )         M3U=1
                     ;;
-        s )         SYNC=1
-                    ;;
         u )         UPDATE=1
                     ;;
         v )         VERBOSE=1
@@ -538,8 +507,6 @@ Options are:
 -h              Display this help message.
 
 -m              Create m3u playlists.
-
--s              Sync with media player (must set SYNCDIR in script).
 
 -u              Override mp.conf and only update (mark downloaded).
 
