@@ -30,7 +30,6 @@ folks to download.
 
 Note, you also need wget, curl, and xsltproc installed. They are usually
 included in most default distro installs or you can get them from your
-distro's repositories. If you want to use the "beta" sync feature, then you
-need rsync too.
+distro's repositories.
 
 Enjoy!
