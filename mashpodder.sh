@@ -39,6 +39,14 @@
 # will create this directory if it does not exist.
 PODCASTDIR="$BASEDIR/podcasts"
 
+# CREATE_PODCASTDIR: Default "1" will create the directory for you if it
+# does not exist; "" means to fail and exit if $PODCASTDIR does not exist.
+# If your podcast directory is on a mounted share (e.g. NFS, Samba), then
+# setting this to "" and thus fail is a means of detecting an unmounted
+# share, and to avoid unintentionally writing to the mount point.  (This
+# assumes that $PODCASTDIR is below, and not, the mount point.)
+CREATE_PODCASTDIR="1"
+
 # TMPDIR: Location of temp logs, where files are temporarily downloaded to,
 # and other bits.  If you have an escaped space in the directory name be
 # sure to keep the double quotes.  Mashpodder will create this directory if
@@ -163,10 +171,17 @@ sanity_checks () {
 
     # Make podcast directory if necessary
     if [ ! -e $PODCASTDIR ]; then
-        if verbose; then
-            echo "Creating podcast directory."
+        if [ "$CREATE_PODCASTDIR" = "1" ]; then
+            if verbose; then
+                echo "Creating podcast directory."
+            fi
+            mkdir -p $PODCASTDIR
+        else
+            crunch "\$PODCASTDIR does not exist.  Please re-check the settings \
+                at the top of mashpodder.sh and try again.  This could also \
+                indiciate an unmounted share, if it is on a shared directory."
+            exit 0
         fi
-        mkdir -p $PODCASTDIR
     fi
 
     # Make tmp directory if necessary
