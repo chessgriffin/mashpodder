@@ -32,11 +32,16 @@
 # Mashpodder will not create this directory for you.
 #BASEDIR="$HOME/mashpodder"
 
-# PODCASTDIR: Location of podcast directories listed in mp.conf.  If you
+# RSSFILE: Location of mp.conf file.  Can be changed to another file name.
+# Default is "$BASEDIR/mp.conf".
+RSSFILE="$BASEDIR/mp.conf"
+
+# PODCASTDIR: Location of podcast directories listed in $RSSFILE.  If you
 # have an escaped space in the directory name be sure to keep the double
 # quotes.  Default is "$BASEDIR/podcasts".  Thanks to startrek.steve for
-# reporting the issues that led to these directory changes.  Mashpodder
-# will create this directory if it does not exist.
+# reporting the issues that led to these directory changes.  Mashpodder will
+# create this directory if it does not exist unless $CREATE_PODCASTDIR is
+# set to "".
 PODCASTDIR="$BASEDIR/podcasts"
 
 # CREATE_PODCASTDIR: Default "1" will create the directory for you if it
@@ -47,6 +52,13 @@ PODCASTDIR="$BASEDIR/podcasts"
 # assumes that $PODCASTDIR is below, and not, the mount point.)
 CREATE_PODCASTDIR="1"
 
+# DATEFILEDIR: Location of the "date" directory below $PODCASTDIR
+# Note: do not use a leading slash, it will get added later.  The
+# eventual location will be $PODCASTDIR/$DATEFILEDIR/$(date +$DATESTRING)
+# Mashpodder will create this directory if it does not exist.
+# Default is "", which results in date directories being put in $PODCASTDIR.
+DATEFILEDIR=""
+
 # TMPDIR: Location of temp logs, where files are temporarily downloaded to,
 # and other bits.  If you have an escaped space in the directory name be
 # sure to keep the double quotes.  Mashpodder will create this directory if
@@ -56,10 +68,6 @@ TMPDIR="$BASEDIR/tmp"
 # DATESTRING: Valid date format for date-based archiving.  Can be changed
 # to other valid formats.  See man date.  Default is "%Y%m%d".
 DATESTRING="%Y%m%d"
-
-# RSSFILE: Location of mp.conf file.  Can be changed to another file name.
-# Default is "$BASEDIR/mp.conf".
-RSSFILE="$BASEDIR/mp.conf"
 
 # PARSE_ENCLOSURE: Location of parse_enclosure.xsl file.  Default is
 # "$BASEDIR/parse_enclosure.xsl".
@@ -232,7 +240,11 @@ sanity_checks () {
             if [ ! "$ARCHIVETYPE" = "date" ]; then
                 DATADIR=$ARCHIVETYPE
             elif [ "$ARCHIVETYPE" = "date" ]; then
-                DATADIR=$(date +$DATESTRING)
+                if [ -n "$DATEFILEDIR" ]; then
+                    DATADIR="$DATEFILEDIR/$(date +$DATESTRING)"
+                else
+                    DATADIR=$(date +$DATESTRING)
+                fi
             else
                 crunch "Error in archive type for $FEED.  It should be set \
                     to 'date' for date-based archiving, or to a directory \
