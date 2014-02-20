@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Mashpodder by Chess Griffin <chess.griffin@gmail.com>
-# Copyright 2009-2013
+# Copyright 2009-2014
 #
 # Originally based on BashPodder by Linc Fessenden 12/1/2004
 #
