@@ -378,6 +378,14 @@ fetch_podcasts () {
             FILE=$(wget -q $FEED -O - | grep url= | \
             sed -n 's/.*url="\([^"]*\)".*/\1/p')
 
+        if [[ -z $FILE ]]; then
+          if verbose; then
+            crunch "ERROR: cannot parse any episodes in $FEED. Skipping.\n"
+            echo "ERROR: could not parse any episodes in $FEED." >> $SUMMARYLOG
+            continue
+          fi
+        fi
+
         for URL in $FILE; do
             FILENAME=''
             if [ "$DLNUM" = "$COUNTER" ]; then
@@ -386,12 +394,17 @@ fetch_podcasts () {
             DLURL=$(curl -s -I -L -w %{url_effective} --url $URL | tail -n 1)
             fix_url $DLURL
             echo $FILENAME >> $TEMPLOG
-
-            if ! grep -x "^$FILENAME" $PODLOG > /dev/null; then
+            if verbose; then
+                echo -n "Found $FILENAME in feed "
+            fi
+            if ! grep -x "^$FILENAME$" $PODLOG > /dev/null; then
+                if verbose; then
+                    echo "but not in \$PODLOG. Proceeding."
+                fi
                 if [ "$DLNUM" = "update" ]; then
                     if verbose; then
-                        crunch "Adding $FILENAME to log."
-                        echo "$FILENAME added to log" >> $SUMMARYLOG
+                        crunch "Adding $FILENAME to \$PODLOG and continuing."
+                        echo "$FILENAME added to \$PODLOG" >> $SUMMARYLOG
                     fi
                     continue
                 fi
@@ -399,7 +412,7 @@ fetch_podcasts () {
                 if [ ! -e $PODCASTDIR/$DATADIR/"$FILENAME" ]; then
                     if verbose; then
                         crunch "NEW:  Fetching $FILENAME and saving in \
-                            directory $DATADIR."
+                            $DATADIR directory."
                         echo "$FILENAME downloaded to $DATADIR" >> $SUMMARYLOG
                     fi
                     cd $TMPDIR
@@ -414,7 +427,16 @@ fetch_podcasts () {
                         fi
                         echo $DATADIR/"$FILENAME" >> $DAILYPLAYLIST
                     fi
+                else
+                  if verbose; then
+                    crunch "$FILENAME appears to already exist in \
+                      $DATADIR directory.  Skipping."
+                  fi
                 fi
+            else
+              if verbose; then
+                  echo "and in \$PODLOG. Skipping."
+              fi
             fi
             ((COUNTER=COUNTER+1))
         done
