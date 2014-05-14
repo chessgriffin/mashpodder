@@ -121,6 +121,13 @@ WGET_QUIET="-q"
 # files are cut short. Thanks to Phil Smith for the bug report.
 WGET_TIMEOUT="30"
 
+# Location of binaries.  Below are the paths to third-party binaries used by
+# mashpodder.  This is here for BSD users where these binaries are usually in
+# /usr/local/bin.  Defaults are Linux locations (i.e. /usr/bin).
+WGET=${WGET:-"/usr/bin/wget"}
+CURL=${CURL:-"/usr/bin/curl"}
+XSLTPROC=${XSLTPROC:-"/usr/bin/xsltproc"}
+
 ### END USER CONFIGURATION
 
 ### No changes should be necessary below this line
@@ -369,13 +376,13 @@ fetch_podcasts () {
             fi
         fi
 
-        FILE=$(wget -q $FEED -O - | \
-            xsltproc $PARSE_ENCLOSURE - 2> /dev/null) || \
+        FILE=$($WGET -q $FEED -O - | \
+            $XSLTPROC $PARSE_ENCLOSURE - 2> /dev/null) || \
             # Let's try the diff from turbooster as reported in Issue 13.
             # If it causes problems, uncomment the next line and comment
             # out the one after that (the one with "grep url=" in it.
-            #FILE=$(wget -q $FEED -O - | tr '\r' '\n' | tr \' \" | \
-            FILE=$(wget -q $FEED -O - | grep url= | \
+            #FILE=$($WGET -q $FEED -O - | tr '\r' '\n' | tr \' \" | \
+            FILE=$($WGET -q $FEED -O - | grep url= | \
             sed -n 's/.*url="\([^"]*\)".*/\1/p')
 
         if [[ -z $FILE ]]; then
@@ -391,7 +398,7 @@ fetch_podcasts () {
             if [ "$DLNUM" = "$COUNTER" ]; then
                 break
             fi
-            DLURL=$(curl -s -I -L -w %{url_effective} --url $URL | tail -n 1)
+            DLURL=$($CURL -s -I -L -w %{url_effective} --url $URL | tail -n 1)
             fix_url $DLURL
             echo $FILENAME >> $TEMPLOG
             if verbose; then
@@ -416,7 +423,7 @@ fetch_podcasts () {
                         echo "$FILENAME downloaded to $DATADIR" >> $SUMMARYLOG
                     fi
                     cd $TMPDIR
-                    wget $WGET_QUIET -c -T $WGET_TIMEOUT -O "$FILENAME" \
+                    $WGET $WGET_QUIET -c -T $WGET_TIMEOUT -O "$FILENAME" \
                         "$DLURL"
                     ((NEWDL=NEWDL+1))
                     mv "$FILENAME" $PODCASTDIR/$DATADIR/"$FILENAME"
