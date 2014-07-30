@@ -132,6 +132,8 @@ XSLTPROC=${XSLTPROC:-"/usr/bin/xsltproc"}
 
 ### No changes should be necessary below this line
 
+shopt -s extglob
+
 SCRIPT=${0##*/}
 CWD=$(pwd)
 TEMPLOG="$TMPDIR/temp.log"
@@ -291,52 +293,36 @@ sanity_checks () {
 fix_url () {
     # Take a url embedded in a feed, get the filename, and perform some
     # fixes
-    local FIXURL
-
-    FIXURL=$1
+    local FIXURL=$1
 
     # Get the filename
-    FIRSTFILENAME=$(echo $FIXURL|awk -F / '{print $NF}')
-    FILENAME=$(echo $FIRSTFILENAME|awk -F "?" '{print $1}')
+    local FIRSTFILENAME=${FIXURL##*/}
+    FILENAME=${FIRSTFILENAME%\?*}
 
     # Remove parentheses in filenames
-    FILENAME=$(echo $FILENAME | tr -d "()")
+    FILENAME=${FILENAME//[()]}
 
     # Replace URL hex sequences in filename (like %20 for ' ' and %2B for '+')
-    FILENAME=$(echo "echo $FILENAME" \
-        |sed "s/%\(..\)/\$(printf \"\\\\x\\1\")/g" |bash)
+    FILENAME=$(printf %b ${FILENAME//%/\\x})
 
     # Replace spaces in filename with underscore
-    FILENAME=$(echo $FILENAME | sed -e 's/ /_/g')
+    FILENAME=${FILENAME// /_}
 
     # Fix Podshow.com numbers that keep changing
-    FILENAME=$(echo $FILENAME | sed -e 's/_pshow_[0-9]*//')
+    FILENAME=${FILENAME/_pshow_+([0-9])/}
 
-    # Fix MSNBC podcast names for audio feeds from Brian Reichart
-    if echo $FIXURL | grep -q "msnbc.*pd_.*mp3$"; then
-        FILENAME=$(echo $FIRSTFILENAME | sed -e 's/.*\(pd_.*mp3$\)/\1/')
-        return
-    fi
-    if echo $FIXURL | grep -q "msnbc.*pdm_.*mp3$"; then
-        FILENAME=$(echo $FIRSTFILENAME | sed -e 's/.*\(pdm_.*mp3$\)/\1/')
-        return
-    fi
-    if echo $FIXURL | grep -q "msnbc.*vh-.*mp3$"; then
-        FILENAME=$(echo $FIRSTFILENAME | sed -e 's/.*\(vh-.*mp3$\)/\1/')
-        return
-    fi
-    if echo $FIXURL | grep -q "msnbc.*zeit.*m4v$"; then
-        FILENAME=$(echo $FIRSTFILENAME | sed -e 's/.*\(a_zeit.*m4v$\)/\1/')
-    fi
 
-    # Fix MSNBC podcast names for video feeds
-    if echo $FIXURL | grep -q "msnbc.*pdv_.*m4v$"; then
-        FILENAME=$(echo $FIRSTFILENAME | sed -e 's/.*\(pdv_.*m4v$\)/\1/')
-        return
-    fi
-
-    # Remove question marks at end
-    FILENAME=$(echo $FILENAME | sed -e 's/?.*$//')
+    case $FIXURL in
+      # Fix MSNBC podcast names for audio feeds
+      *msnbc*)
+        [[ $FIRSTFILENAME =~ pd_.*|pdm_.*|vh-.*|a_zeit_.*|pdv_.* ]] && FILENAME=$BASH_REMATCH
+        ;;
+      # Fix scientific american episode names
+      # They are all podcast.mp3 distinguished by fileId url param
+      *scientificamerican*)
+        FILENAME="sciam-${FIRSTFILENAME#*fileId=}.mp3"
+        ;;
+    esac
 }
 
 check_directory () {
