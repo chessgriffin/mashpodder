@@ -155,7 +155,7 @@ verbose () {
 
 sanity_checks () {
     # Perform some basic checks
-    local FEED ARCHIVETYPE DLNUM DATADIR NEWPODLOG
+    local FEED ARCHIVETYPE DLNUM DATADIR NEWPODLOG INCREMENT
 
     # Print the date
     if verbose; then
@@ -287,7 +287,20 @@ sanity_checks () {
         if verbose; then
             echo "Backing up the $PODLOG file."
         fi
-        NEWPODLOG="$PODLOG.$(date +$DATESTRING)"
+        if [ -f "$PODLOG.$(date +$DATESTRING)" ]; then
+            INCREMENT=0
+            while true; do
+                ((INCREMENT=INCREMENT+1))
+                if [ -f "$PODLOG.$(date +$DATESTRING)-$INCREMENT" ]; then
+                    continue
+                else
+                    NEWPODLOG="$PODLOG.$(date +$DATESTRING)-$INCREMENT"
+                    break
+                fi
+            done
+        else
+            NEWPODLOG="$PODLOG.$(date +$DATESTRING)"
+        fi
         cp $PODLOG $NEWPODLOG
     fi
 
