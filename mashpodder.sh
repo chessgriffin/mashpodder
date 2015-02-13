@@ -224,8 +224,8 @@ sanity_checks () {
 
         # Skip blank lines and lines beginning with '#'
         if echo $LINE | grep -E '^#|^$' > /dev/null
-                then
-                continue
+            then
+            continue
         fi
 
         if [[ "$DLNUM" != "none" && "$DLNUM" != "all" && \
@@ -386,11 +386,11 @@ fetch_podcasts () {
             sed -n 's/.*url="\([^"]*\)".*/\1/p')
 
         if [[ -z $FILE ]]; then
-          if verbose; then
-            crunch "ERROR: cannot parse any episodes in $FEED. Skipping.\n"
-            echo "ERROR: could not parse any episodes in $FEED." >> $SUMMARYLOG
-            continue
-          fi
+            if verbose; then
+                crunch "ERROR: cannot parse any episodes in $FEED. Skipping.\n"
+                echo "ERROR: could not parse any episodes in $FEED." >> $SUMMARYLOG
+                continue
+            fi
         fi
 
         for URL in $FILE; do
@@ -435,15 +435,15 @@ fetch_podcasts () {
                         echo $DATADIR/"$FILENAME" >> $DAILYPLAYLIST
                     fi
                 else
-                  if verbose; then
-                    crunch "$FILENAME appears to already exist in \
-                      $DATADIR directory.  Skipping."
-                  fi
+                    if verbose; then
+                        crunch "$FILENAME appears to already exist in \
+                            $DATADIR directory.  Skipping."
+                    fi
                 fi
             else
-              if verbose; then
-                  echo "and in \$PODLOG. Skipping."
-              fi
+                if verbose; then
+                    echo "and in \$PODLOG. Skipping."
+                fi
             fi
             ((COUNTER=COUNTER+1))
         done
