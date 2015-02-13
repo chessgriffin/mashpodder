@@ -181,6 +181,22 @@ sanity_checks () {
 
     cd $BASEDIR
 
+    # Check to see if the dependent binaries are installed
+    if [ ! -x $XSLTPROC ]; then
+        crunch "xsltproc not found or is not executable!  Exiting."
+        exit 0
+    fi
+
+    if [ ! -x $WGET ]; then
+        crunch "wget not found or is not executable!  Exiting."
+        exit 0
+    fi
+
+    if [ ! -x $CURL ]; then
+        crunch "curl not found or is not executable!  Exiting."
+        exit 0
+    fi
+
     # Make podcast directory if necessary
     if [ ! -e $PODCASTDIR ]; then
         if [ "$CREATE_PODCASTDIR" = "1" ]; then
