@@ -2,6 +2,8 @@ mashpodder
 
 podcatching client based on BashPodder
 
+UPDATE 2015:  I am no longer maintaining mashpodder.
+
 Starting in 2005, I have maintained a 'user-contributed' version of
 BashPodder, the great podcatcher originally written by Linc Fessenden. My
 mashup has become pretty popular, and I have maintained five separate releases
