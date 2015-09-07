@@ -155,7 +155,7 @@ verbose () {
 
 sanity_checks () {
     # Perform some basic checks
-    local FEED ARCHIVETYPE DLNUM DATADIR NEWPODLOG
+    local FEED ARCHIVETYPE DLNUM DATADIR NEWPODLOG USERNAME PASSWORD
 
     # Print the date
     if verbose; then
@@ -217,10 +217,14 @@ sanity_checks () {
 
     # Check the mp.conf and do some basic error checking
     while read LINE; do
+        USERNAME=""
+        PASSWORD=""
         DLNUM="none"
         FEED=$(echo $LINE | cut -f1 -d ' ')
         ARCHIVETYPE=$(echo $LINE | cut -f2 -d ' ')
         DLNUM=$(echo $LINE | cut -f3 -d ' ')
+        USERNAME=$(echo $LINE | cut -f4 -d ' ')
+        PASSWORD=$(echo $LINE | cut -f5 -d ' ')
 
         # Skip blank lines and lines beginning with '#'
         if echo $LINE | grep -E '^#|^$' > /dev/null
@@ -263,7 +267,7 @@ sanity_checks () {
         if [ "$UPDATE" = "1" ]; then
             DLNUM="update"
         fi
-        echo "$FEED $DATADIR $DLNUM" >> $TEMPRSSFILE
+        echo "$FEED $DATADIR $DLNUM $USERNAME $PASSWORD" >> $TEMPRSSFILE
     done < $RSSFILE
 
     # Backup the $PODLOG if $PODLOG_BACKUP=1
@@ -351,15 +355,20 @@ check_directory () {
 
 fetch_podcasts () {
     # This is the main loop
-    local LINE FEED DATADIR DLNUM COUNTER FILE URL FILENAME DLURL
+    local LINE FEED DATADIR DLNUM COUNTER FILE URL FILENAME DLURL USERNAME PASSWORD UP
 
     # Read the mp.conf file and wget any url not already in the
     # podcast.log file:
     NEWDL=0
     while read LINE; do
+        USERNAME=""
+        PASSWORD=""
+        UP=""
         FEED=$(echo $LINE | cut -f1 -d ' ')
         DATADIR=$(echo $LINE | cut -f2 -d ' ')
         DLNUM=$(echo $LINE | cut -f3 -d ' ')
+        USERNAME=$(echo $LINE | cut -f4 -d ' ')
+        PASSWORD=$(echo $LINE | cut -f5 -d ' ')
         COUNTER=0
 
         if verbose; then
@@ -374,6 +383,10 @@ fetch_podcasts () {
             else
                 crunch "Checking $FEED -- last $DLNUM episodes."
             fi
+        fi
+
+        if [ "x$USERNAME" != "x" ] && [ "x$PASSWORD" != "x" ]; then
+            FEED=$(sed 's|\://|'"&$USERNAME"'\:'"$PASSWORD"'@|' <<< $FEED)
         fi
 
         FILE=$($WGET -q $FEED -O - | \
@@ -400,6 +413,12 @@ fetch_podcasts () {
             fi
             DLURL=$($CURL -s -I -L -w %{url_effective} --url $URL | tail -n 1)
             fix_url $DLURL
+
+
+            if [ "x$USERNAME" != "x" ] && [ "x$PASSWORD" != "x" ]; then
+                DLURL=$(sed 's|\://|'"&$USERNAME"'\:'"$PASSWORD"'@|' <<< $DLURL)
+            fi
+
             echo $FILENAME >> $TEMPLOG
             if verbose; then
                 echo -n "Found $FILENAME in feed "
