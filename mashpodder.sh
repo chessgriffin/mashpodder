@@ -155,7 +155,7 @@ verbose () {
 
 sanity_checks () {
     # Perform some basic checks
-    local FEED ARCHIVETYPE DLNUM DATADIR NEWPODLOG
+    local FEED ARCHIVETYPE DLNUM DATADIR NEWPODLOG INCREMENT
 
     # Print the date
     if verbose; then
@@ -180,6 +180,22 @@ sanity_checks () {
     fi
 
     cd $BASEDIR
+
+    # Check to see if the dependent binaries are installed
+    if [ ! -x $XSLTPROC ]; then
+        crunch "xsltproc not found or is not executable!  Exiting."
+        exit 0
+    fi
+
+    if [ ! -x $WGET ]; then
+        crunch "wget not found or is not executable!  Exiting."
+        exit 0
+    fi
+
+    if [ ! -x $CURL ]; then
+        crunch "curl not found or is not executable!  Exiting."
+        exit 0
+    fi
 
     # Make podcast directory if necessary
     if [ ! -e $PODCASTDIR ]; then
@@ -224,8 +240,8 @@ sanity_checks () {
 
         # Skip blank lines and lines beginning with '#'
         if echo $LINE | grep -E '^#|^$' > /dev/null
-                then
-                continue
+            then
+            continue
         fi
 
         if [[ "$DLNUM" != "none" && "$DLNUM" != "all" && \
@@ -271,7 +287,20 @@ sanity_checks () {
         if verbose; then
             echo "Backing up the $PODLOG file."
         fi
-        NEWPODLOG="$PODLOG.$(date +$DATESTRING)"
+        if [ -f "$PODLOG.$(date +$DATESTRING)" ]; then
+            INCREMENT=0
+            while true; do
+                ((INCREMENT=INCREMENT+1))
+                if [ -f "$PODLOG.$(date +$DATESTRING)-$INCREMENT" ]; then
+                    continue
+                else
+                    NEWPODLOG="$PODLOG.$(date +$DATESTRING)-$INCREMENT"
+                    break
+                fi
+            done
+        else
+            NEWPODLOG="$PODLOG.$(date +$DATESTRING)"
+        fi
         cp $PODLOG $NEWPODLOG
     fi
 
@@ -386,11 +415,11 @@ fetch_podcasts () {
             sed -n 's/.*url="\([^"]*\)".*/\1/p')
 
         if [[ -z $FILE ]]; then
-          if verbose; then
-            crunch "ERROR: cannot parse any episodes in $FEED. Skipping.\n"
-            echo "ERROR: could not parse any episodes in $FEED." >> $SUMMARYLOG
-            continue
-          fi
+            if verbose; then
+                crunch "ERROR: cannot parse any episodes in $FEED. Skipping.\n"
+                echo "ERROR: could not parse any episodes in $FEED." >> $SUMMARYLOG
+                continue
+            fi
         fi
 
         for URL in $FILE; do
@@ -435,15 +464,15 @@ fetch_podcasts () {
                         echo $DATADIR/"$FILENAME" >> $DAILYPLAYLIST
                     fi
                 else
-                  if verbose; then
-                    crunch "$FILENAME appears to already exist in \
-                      $DATADIR directory.  Skipping."
-                  fi
+                    if verbose; then
+                        crunch "$FILENAME appears to already exist in \
+                            $DATADIR directory.  Skipping."
+                    fi
                 fi
             else
-              if verbose; then
-                  echo "and in \$PODLOG. Skipping."
-              fi
+                if verbose; then
+                    echo "and in \$PODLOG. Skipping."
+                fi
             fi
             ((COUNTER=COUNTER+1))
         done
